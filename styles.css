@@ -231,3 +231,8 @@ a:hover {
     height: 60vh;
   }
 }
+/* 仅覆盖聊天窗口里的发送按钮 */
+#chat-input-area #chat-send {
+  width: auto;      /* 让按钮按内容宽度排布 */
+  flex: 0 0 auto;   /* 不拉伸、不收缩 */
+}
