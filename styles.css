@@ -99,3 +99,18 @@ a {
 .task-checkbox {
   transform: scale(1.2);
 }
+#manual-add {
+  margin-top: 30px;
+  padding-top: 10px;
+  border-top: 1px solid #ddd;
+}
+
+#manual-add input,
+#manual-add button {
+  display: block;
+  width: 100%;
+  margin: 8px 0;
+  padding: 10px;
+  font-size: 14px;
+  box-sizing: border-box;
+}

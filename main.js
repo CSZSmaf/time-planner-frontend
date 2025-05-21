@@ -177,3 +177,41 @@ document.getElementById("logout-btn").onclick = () => {
   planSection.style.display = "none";
   loginSection.style.display = "block";
 };
+// ✅ 手动添加任务
+document.getElementById("add-task-btn").onclick = async () => {
+  const task = document.getElementById("manual-task").value.trim();
+  const date = document.getElementById("manual-date").value;
+  const duration = parseFloat(document.getElementById("manual-duration").value);
+
+  if (!task || !date || !duration) {
+    alert("请完整填写任务内容、日期和时长");
+    return;
+  }
+
+  try {
+    const res = await fetch(`${API_BASE}/api/tasks`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        userId: currentUserId,
+        task,
+        duration,
+        date
+      }),
+    });
+
+    if (res.ok) {
+      alert("任务添加成功！");
+      // 清空表单
+      document.getElementById("manual-task").value = "";
+      document.getElementById("manual-date").value = "";
+      document.getElementById("manual-duration").value = "";
+      // 重新加载任务
+      await loadTasks();
+    } else {
+      alert("任务添加失败");
+    }
+  } catch (err) {
+    alert("网络错误，添加失败");
+  }
+};

@@ -33,6 +33,15 @@
         <input type="text" id="goal-input" placeholder="请输入你的学习目标" />
         <button id="generate-plan">生成7天计划</button>
       </div>
+      <!-- 手动添加任务区域 -->
+      <div id="manual-add">
+      <h3>✍️ 手动添加任务</h3>
+      <input type="text" id="manual-task" placeholder="任务内容" />
+      <input type="date" id="manual-date" />
+      <input type="number" id="manual-duration" placeholder="时长 (小时)" min="0.5" step="0.5" />
+      <button id="add-task-btn">添加任务</button>
+</div>
+
       <div id="task-board"></div>
       <button id="logout-btn">退出登录</button>
     </div>
