@@ -1,55 +1,93 @@
-:root {
-  --accent: #5d5fe4;
-  --bg: #f5f7fa;
-  --card-bg: #ffffff;
-  --text: #1f2430;
-  --radius: 12px;
-  --shadow: 0 4px 16px rgba(0,0,0,0.08);
-  font-family: 'Inter', sans-serif;
+body {
+  font-family: "Helvetica Neue", sans-serif;
+  background-color: #f3f4f6;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
 }
-*{box-sizing:border-box;margin:0;padding:0}
-body{background:var(--bg);color:var(--text);line-height:1.5;}
-header.header{padding:2rem 1rem;text-align:center;background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;}
-header .tagline{opacity:.9;margin-top:.5rem}
-.container{max-width:900px;margin:2rem auto;display:grid;gap:1.5rem}
-.card{background:var(--card-bg);border-radius:var(--radius);padding:1.5rem;box-shadow:var(--shadow)}
-textarea{width:100%;min-height:90px;padding:.75rem;border:1px solid #ddd;border-radius:var(--radius);resize:vertical;font-size:1rem}
-.btn-primary{margin-top:1rem;background:var(--accent);color:#fff;border:none;padding:.6rem 1.2rem;border-radius:var(--radius);cursor:pointer;font-size:1rem}
-.btn-primary:hover{opacity:.9}
-.plan-preview{background:#fafafa;border:1px dashed #ccc;border-radius:var(--radius);padding:1rem;margin-top:1rem;white-space:pre-wrap}
-.task-list{list-style:none;margin-top:1rem}
-.task-list li{display:flex;align-items:center;justify-content:space-between;padding:.5rem 0;border-bottom:1px solid #eee}
-.task-list li:last-child{border-bottom:none}
-.task-text{cursor:pointer;flex:1}
-.task-text.done{text-decoration:line-through;opacity:.6}
-.remind-btn{background:none;border:none;font-size:1.2rem;cursor:pointer;color:var(--accent)}
-/* Drawer */
-.drawer{position:fixed;bottom:0;right:0;width:320px;height:60%;background:#fff;border-top-left-radius:var(--radius);border-top-right-radius:var(--radius);box-shadow:0 -4px 16px rgba(0,0,0,.15);display:flex;flex-direction:column}
-.drawer.hidden{display:none}
-.drawer-header{display:flex;justify-content:space-between;align-items:center;padding:.75rem 1rem;border-bottom:1px solid #eee}
-.chat-log{flex:1;overflow-y:auto;padding:1rem;font-size:.9rem}
-.chat-log p{margin-bottom:.5rem}
-#chatInput{border:1px solid #ddd;border-radius:var(--radius);padding:.5rem;margin:0 .75rem .5rem}
-/* 你可以在 styles.css 末尾加入，提升浮动按钮可见性 */
-.chat-floating-btn{
-  position:fixed;
-  bottom:20px;right:20px;
-  background:#5d5fe4;color:#fff;
-  border:none;border-radius:50%;
-  width:52px;height:52px;
-  font-size:24px;box-shadow:0 4px 12px rgba(0,0,0,.25);
-  cursor:pointer;z-index:100;
+
+.container {
+  max-width: 600px;
+  width: 100%;
+  margin-top: 50px;
+  padding: 30px;
+  background-color: #ffffff;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  border-radius: 8px;
 }
-.chat-floating-btn:hover{opacity:.9}
-.stats-list { list-style:none; margin-top:1rem; padding:0; }
-.stats-list li { display:flex; justify-content:space-between; padding:.4rem 0; border-bottom:1px solid #eee; }
-.stats-list li:last-child { border-bottom:none; }
-/* 校徽样式：确保它位于左上角 */
-.school-logo {
-  position: absolute;
-  top: 10px;   /* 离顶部10px */
-  left: 10px;  /* 离左侧10px */
-  height: 120px;  /* 或者更大，例如120px */
-  width: auto;
-  z-index: 1000;
+
+h2 {
+  margin-bottom: 20px;
+  color: #1f2937;
+  text-align: center;
+}
+
+h3 {
+  margin-top: 24px;
+  color: #111827;
+  font-size: 18px;
+  border-bottom: 1px solid #d1d5db;
+  padding-bottom: 4px;
+}
+
+input[type="email"],
+input[type="password"],
+input[type="text"] {
+  width: 100%;
+  padding: 10px;
+  margin: 8px 0 16px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
+button {
+  width: 100%;
+  padding: 10px;
+  margin-top: 4px;
+  background-color: #3b82f6;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 4px;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+button:hover {
+  background-color: #2563eb;
+}
+
+a {
+  color: #3b82f6;
+  cursor: pointer;
+}
+
+.task-day {
+  margin-top: 20px;
+  padding: 10px 14px;
+  background-color: #f9fafb;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+}
+
+.task-item {
+  margin: 6px 0;
+  padding: 8px 10px;
+  background-color: #ffffff;
+  border-left: 4px solid #3b82f6;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+  font-size: 14px;
+  display: flex;
+  justify-content: space-between;
+}
+
+.duration {
+  color: #6b7280;
+  font-size: 13px;
 }
