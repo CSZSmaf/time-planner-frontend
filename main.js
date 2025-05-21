@@ -234,3 +234,39 @@ document.getElementById("add-task-btn").onclick = async () => {
     alert("网络错误，添加失败");
   }
 };
+// ✅ 聊天窗口展开与隐藏
+const chatToggle = document.getElementById("chat-toggle");
+const chatBox = document.getElementById("chat-box");
+chatToggle.onclick = () => {
+  chatBox.style.display = chatBox.style.display === "none" ? "flex" : "none";
+};
+
+// ✅ 聊天发送
+document.getElementById("chat-send").onclick = async () => {
+  const input = document.getElementById("chat-input");
+  const msg = input.value.trim();
+  if (!msg) return;
+
+  appendMessage("🧑‍🎓 你：", msg);
+  input.value = "";
+
+  try {
+    const res = await fetch(`${API_BASE}/api/chat`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ message: msg }),
+    });
+    const data = await res.json();
+    appendMessage("🤖 AI：", data.reply || "无回复");
+  } catch (err) {
+    appendMessage("⚠️ 系统：", "连接失败，请稍后再试。");
+  }
+};
+
+function appendMessage(sender, text) {
+  const chat = document.getElementById("chat-messages");
+  const entry = document.createElement("div");
+  entry.innerHTML = `<strong>${sender}</strong> ${text}`;
+  chat.appendChild(entry);
+  chat.scrollTop = chat.scrollHeight;
+}
