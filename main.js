@@ -89,11 +89,18 @@ async function loadTasks() {
       return;
     }
 
+    const tasksArray = Array.isArray(data) ? data : data.tasks || [];
+
+    if (tasksArray.length === 0) {
+      taskBoard.innerHTML = "<p>暂无任务，请先生成或手动添加</p>";
+      return;
+    }
+
     const grouped = {};
-    for (const task of data.tasks) {
-      const date = task.date;
-      if (!grouped[date]) grouped[date] = [];
-      grouped[date].push(task);
+    for (const task of tasksArray) {
+      const dateKey = task.date;          // 后端字段如果叫 task_date，请改成 task.task_date
+      if (!grouped[dateKey]) grouped[dateKey] = [];
+      grouped[dateKey].push(task);
     }
 
     taskBoard.innerHTML = "";
