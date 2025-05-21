@@ -1,4 +1,4 @@
-/* 🌐 全局样式 */
+/* 🌐 全局 */
 body {
   font-family: "Helvetica Neue", sans-serif;
   background-color: #f3f4f6;
@@ -20,13 +20,12 @@ body {
   border-radius: 8px;
 }
 
-/* 📌 标题样式 */
+/* 📌 标题 */
 h2 {
   margin-bottom: 20px;
   color: #1f2937;
   text-align: center;
 }
-
 h3 {
   margin-top: 24px;
   color: #111827;
@@ -35,7 +34,7 @@ h3 {
   padding-bottom: 4px;
 }
 
-/* 📝 输入框通用样式 */
+/* 📝 输入框 */
 input[type="email"],
 input[type="password"],
 input[type="text"],
@@ -50,9 +49,14 @@ input[type="number"] {
   box-sizing: border-box;
 }
 
-/* 🔘 按钮通用样式 */
-button {
+/* 🔘 按钮
+   只限制 .container 里的按钮满宽，
+   聊天窗口里的按钮就不会被影响 */
+.container button {
   width: 100%;
+}
+
+button {
   padding: 10px;
   margin-top: 4px;
   background-color: #3b82f6;
@@ -64,11 +68,7 @@ button {
   cursor: pointer;
   transition: background-color 0.2s ease;
 }
-
-button:hover {
-  background-color: #2563eb;
-}
-
+button:hover { background-color: #2563eb; }
 button:focus,
 input:focus {
   outline: none;
@@ -76,14 +76,8 @@ input:focus {
 }
 
 /* 🔗 链接 */
-a {
-  color: #3b82f6;
-  cursor: pointer;
-  text-decoration: none;
-}
-a:hover {
-  text-decoration: underline;
-}
+a { color: #3b82f6; text-decoration: none; }
+a:hover { text-decoration: underline; }
 
 /* ✅ 任务展示 */
 .task-day {
@@ -93,11 +87,7 @@ a:hover {
   border: 1px solid #e5e7eb;
   border-radius: 6px;
 }
-.task-day p {
-  font-size: 14px;
-  margin-bottom: 0;
-  color: #374151;
-}
+.task-day p { font-size: 14px; margin: 0; color: #374151; }
 
 .task-item {
   display: flex;
@@ -112,22 +102,11 @@ a:hover {
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
   font-size: 14px;
 }
+.task-item.completed { text-decoration: line-through; opacity: 0.6; }
+.duration { color: #6b7280; font-size: 13px; }
+.task-checkbox { transform: scale(1.2); }
 
-.task-item.completed {
-  text-decoration: line-through;
-  opacity: 0.6;
-}
-
-.duration {
-  color: #6b7280;
-  font-size: 13px;
-}
-
-.task-checkbox {
-  transform: scale(1.2);
-}
-
-/* ➕ 手动添加任务区 */
+/* ➕ 手动添加任务 */
 #manual-add {
   margin-top: 30px;
   padding-top: 10px;
@@ -143,7 +122,7 @@ a:hover {
   box-sizing: border-box;
 }
 
-/* 🤖 聊天浮动按钮 */
+/* 🤖 浮动聊天按钮 */
 #chat-toggle {
   position: fixed;
   bottom: 20px;
@@ -162,7 +141,7 @@ a:hover {
   z-index: 999;
 }
 
-/* 💬 聊天窗口 */
+/* 💬 聊天窗口主体 */
 #chat-box {
   position: fixed;
   bottom: 100px;
@@ -178,7 +157,6 @@ a:hover {
   z-index: 999;
   overflow: hidden;
 }
-
 #chat-messages {
   flex: 1;
   padding: 12px;
@@ -196,7 +174,6 @@ a:hover {
   gap: 8px;
   background-color: white;
 }
-
 #chat-input {
   flex: 1;
   padding: 10px;
@@ -207,32 +184,16 @@ a:hover {
   box-sizing: border-box;
 }
 
-#chat-send {
+/* 单独覆盖发送按钮 —— 取消 100% 宽 */
+#chat-input-area #chat-send {
+  width: auto;
+  flex: 0 0 auto;
   padding: 10px 16px;
-  font-size: 14px;
-  background-color: #3b82f6;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
   white-space: nowrap;
 }
 
-/* 📱 响应式优化 */
+/* 📱 响应式 */
 @media (max-width: 500px) {
-  .container {
-    padding: 20px;
-    margin-top: 20px;
-  }
-
-  #chat-box {
-    width: 90vw;
-    right: 5vw;
-    height: 60vh;
-  }
-}
-/* 仅覆盖聊天窗口里的发送按钮 */
-#chat-input-area #chat-send {
-  width: auto;      /* 让按钮按内容宽度排布 */
-  flex: 0 0 auto;   /* 不拉伸、不收缩 */
+  .container { padding: 20px; margin-top: 20px; }
+  #chat-box { width: 90vw; right: 5vw; height: 60vh; }
 }
