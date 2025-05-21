@@ -1,42 +1,89 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Time Planner AI</title>
+  <title>AI Time Planner</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    body { font-family: sans-serif; margin: 2rem; }
-    input, button { margin: 0.5rem 0; padding: 0.5rem; }
-    #taskList li { margin-bottom: 0.5rem; }
+    * { box-sizing: border-box; font-family: 'Inter', sans-serif; }
+    body {
+      margin: 0;
+      background: linear-gradient(to right, #e0f2fe, #f0f9ff);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+    .container {
+      background: white;
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 420px;
+    }
+    h1 {
+      font-size: 1.5rem;
+      text-align: center;
+      color: #0f172a;
+      margin-bottom: 1rem;
+    }
+    input, button {
+      width: 100%;
+      padding: 0.75rem;
+      margin-top: 0.5rem;
+      font-size: 1rem;
+      border: 1px solid #cbd5e1;
+      border-radius: 0.5rem;
+    }
+    button {
+      background-color: #3b82f6;
+      color: white;
+      border: none;
+      font-weight: 600;
+      transition: background 0.3s;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #2563eb;
+    }
     .hidden { display: none; }
+    .message {
+      margin-top: 0.75rem;
+      font-size: 0.95rem;
+      text-align: center;
+    }
+    ul { padding-left: 1.2rem; margin-top: 0.5rem; }
+    li { margin-bottom: 0.5rem; line-height: 1.5; }
   </style>
 </head>
 <body>
-  <h1>AI Time Planner</h1>
+  <div class="container">
+    <h1>AI Time Planner</h1>
 
-  <!-- 登录注册 -->
-  <div id="authSection">
-    <input id="email" type="email" placeholder="Email" /> <br />
-    <input id="password" type="password" placeholder="Password" /> <br />
-    <button onclick="register()">注册</button>
-    <button onclick="login()">登录</button>
-  </div>
+    <!-- 登录注册区域 -->
+    <div id="authSection">
+      <input id="email" type="email" placeholder="邮箱 Email" />
+      <input id="password" type="password" placeholder="密码 Password" />
+      <button onclick="register()">注册</button>
+      <button onclick="login()">登录</button>
+      <div id="msg" class="message"></div>
+    </div>
 
-  <!-- 用户操作区域 -->
-  <div id="appSection" class="hidden">
-    <p>当前用户: <span id="userEmail"></span></p>
-    <button onclick="logout()">退出登录</button>
-    <h2>学习目标</h2>
-    <input id="goalInput" placeholder="请输入学习目标..." />
-    <button onclick="generatePlan()">生成计划</button>
-
-    <h2>计划任务</h2>
-    <ul id="taskList"></ul>
+    <!-- 用户任务区域 -->
+    <div id="appSection" class="hidden">
+      <p>当前用户：<span id="userEmail"></span></p>
+      <button onclick="logout()">退出登录</button>
+      <input id="goalInput" placeholder="请输入学习目标..." />
+      <button onclick="generatePlan()">生成计划</button>
+      <h3>你的计划任务：</h3>
+      <ul id="taskList"></ul>
+    </div>
   </div>
 
   <script>
     const API_BASE = 'https://time-planner-backend.onrender.com';
-
     let currentUserId = null;
 
     function showApp(userId, email) {
@@ -54,45 +101,55 @@
     }
 
     async function register() {
-  const email = document.getElementById('email').value;
-  const password = document.getElementById('password').value;
-  const msg = document.getElementById('msg');
-  msg.textContent = '';
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const msg = document.getElementById('msg');
+      msg.textContent = '';
 
-  try {
-    const res = await fetch(`${API_BASE}/api/register`, {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ email, password })
-    });
+      try {
+        const res = await fetch(`${API_BASE}/api/register`, {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
 
-    const data = await res.json();
-
-    if (data.error) {
-      msg.style.color = '#e11d48';
-      msg.textContent = `注册失败：${data.error}`;
-    } else {
-      msg.style.color = '#16a34a';
-      msg.textContent = '✅ 注册成功，请登录';
+        if (data.error) {
+          msg.style.color = '#e11d48';
+          msg.textContent = `注册失败：${data.error}`;
+        } else {
+          msg.style.color = '#16a34a';
+          msg.textContent = '✅ 注册成功，请登录';
+        }
+      } catch (err) {
+        msg.style.color = '#e11d48';
+        msg.textContent = '⚠️ 网络错误，请稍后重试';
+      }
     }
-  } catch (err) {
-    msg.style.color = '#e11d48';
-    msg.textContent = '⚠️ 网络错误，请稍后重试';
-  }
-}
-
 
     async function login() {
       const email = document.getElementById('email').value;
       const password = document.getElementById('password').value;
-      const res = await fetch(`${API_BASE}/api/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
-      });
-      const data = await res.json();
-      if (data.userId) showApp(data.userId, email);
-      else alert(data.error || '登录失败');
+      const msg = document.getElementById('msg');
+      msg.textContent = '';
+
+      try {
+        const res = await fetch(`${API_BASE}/api/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await res.json();
+
+        if (data.userId) showApp(data.userId, email);
+        else {
+          msg.style.color = '#e11d48';
+          msg.textContent = data.error || '登录失败';
+        }
+      } catch {
+        msg.style.color = '#e11d48';
+        msg.textContent = '⚠️ 登录失败，请检查网络';
+      }
     }
 
     async function generatePlan() {
