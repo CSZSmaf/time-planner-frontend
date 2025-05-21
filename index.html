@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Time Planner AI</title>
+  <style>
+    body { font-family: sans-serif; margin: 2rem; }
+    input, button { margin: 0.5rem 0; padding: 0.5rem; }
+    #taskList li { margin-bottom: 0.5rem; }
+    .hidden { display: none; }
+  </style>
+</head>
+<body>
+  <h1>AI Time Planner</h1>
+
+  <!-- 登录注册 -->
+  <div id="authSection">
+    <input id="email" type="email" placeholder="Email" /> <br />
+    <input id="password" type="password" placeholder="Password" /> <br />
+    <button onclick="register()">注册</button>
+    <button onclick="login()">登录</button>
+  </div>
+
+  <!-- 用户操作区域 -->
+  <div id="appSection" class="hidden">
+    <p>当前用户: <span id="userEmail"></span></p>
+    <button onclick="logout()">退出登录</button>
+    <h2>学习目标</h2>
+    <input id="goalInput" placeholder="请输入学习目标..." />
+    <button onclick="generatePlan()">生成计划</button>
+
+    <h2>计划任务</h2>
+    <ul id="taskList"></ul>
+  </div>
+
+  <script>
+    const API_BASE = 'https://time-planner-backend.onrender.com';
+
+    let currentUserId = null;
+
+    function showApp(userId, email) {
+      currentUserId = userId;
+      document.getElementById('userEmail').textContent = email;
+      document.getElementById('authSection').classList.add('hidden');
+      document.getElementById('appSection').classList.remove('hidden');
+      loadTasks();
+    }
+
+    function logout() {
+      currentUserId = null;
+      document.getElementById('authSection').classList.remove('hidden');
+      document.getElementById('appSection').classList.add('hidden');
+    }
+
+    async function register() {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const res = await fetch(`${API_BASE}/api/register`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await res.json();
+      if (data.userId) showApp(data.userId, email);
+      else alert(data.error || '注册失败');
+    }
+
+    async function login() {
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const res = await fetch(`${API_BASE}/api/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+      const data = await res.json();
+      if (data.userId) showApp(data.userId, email);
+      else alert(data.error || '登录失败');
+    }
+
+    async function generatePlan() {
+      const goal = document.getElementById('goalInput').value;
+      const res = await fetch(`${API_BASE}/api/plan`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ goal })
+      });
+      const data = await res.json();
+      const tasks = parsePlan(data.plan);
+      await saveTasks(tasks);
+      loadTasks();
+    }
+
+    async function saveTasks(tasks) {
+      for (const t of tasks) {
+        await fetch(`${API_BASE}/api/tasks`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ ...t, userId: currentUserId })
+        });
+      }
+    }
+
+    async function loadTasks() {
+      const res = await fetch(`${API_BASE}/api/tasks/${currentUserId}`);
+      const data = await res.json();
+      const list = document.getElementById('taskList');
+      list.innerHTML = '';
+      data.tasks.forEach(t => {
+        const li = document.createElement('li');
+        li.textContent = `${t.date} - ${t.task} (${t.duration})`;
+        list.appendChild(li);
+      });
+    }
+
+    function parsePlan(text) {
+      const lines = text.split(/\r?\n/).filter(Boolean);
+      const tasks = [];
+      let offset = 0;
+      lines.forEach(line => {
+        const clean = line.trim();
+        const dayMatch = clean.match(/^DAY\s*(\d+)/i);
+        if (dayMatch) {
+          offset = parseInt(dayMatch[1], 10) - 1;
+          return;
+        }
+        if (/^([-*•\u2022]|\d+\.)\s*/.test(clean)) {
+          const withoutBullet = clean.replace(/^([-*•\u2022]|\d+\.)\s*/, '');
+          const parts = withoutBullet.split(/[@|·]/);
+          tasks.push({
+            task: parts[0].trim(),
+            duration: parts[1] ? parts[1].trim() : '?',
+            date: new Date(Date.now() + offset * 864e5).toDateString()
+          });
+        }
+      });
+      return tasks;
+    }
+  </script>
+</body>
+</html>
