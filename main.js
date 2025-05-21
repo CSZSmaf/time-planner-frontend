@@ -97,50 +97,69 @@ async function loadTasks() {
     }
 
     taskBoard.innerHTML = "";
+
 for (const date in grouped) {
   const section = document.createElement("div");
   section.className = "task-day";
 
-  // ✅ 美化日期格式
+  // ✅ 日期格式
   const d = new Date(date);
-  const formattedDate = `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}-${d.getDate().toString().padStart(2, '0')}`;
+  const formattedDate = `${d.getFullYear()}-${(d.getMonth() + 1)
+    .toString()
+    .padStart(2, "0")}-${d.getDate().toString().padStart(2, "0")}`;
   const title = document.createElement("h3");
   title.textContent = `📅 ${formattedDate}`;
   section.appendChild(title);
 
-  grouped[date].forEach(t => {
-    const item = document.createElement("div");
-    item.className = "task-item";
+  // ✅ 已完成和未完成分组
+  const doneList = grouped[date].filter((t) => t.done);
+  const undoneList = grouped[date].filter((t) => !t.done);
 
-    // ✅ 创建复选框
-    const checkbox = document.createElement("input");
-    checkbox.type = "checkbox";
-    checkbox.checked = t.done; // 根据任务状态设置初始值
-    checkbox.className = "task-checkbox";
+  // ✅ 渲染子任务函数
+  const renderList = (tasks, label) => {
+    if (tasks.length === 0) return;
+    const subTitle = document.createElement("p");
+    subTitle.textContent = label;
+    subTitle.style.fontWeight = "bold";
+    subTitle.style.margin = "8px 0 4px";
+    section.appendChild(subTitle);
 
-    // ✅ 创建任务内容
-    const content = document.createElement("span");
-    content.textContent = `📝 ${t.task} (${t.duration}小时)`;
-    if (t.done) content.style.textDecoration = "line-through";
+    tasks.forEach((t) => {
+      const item = document.createElement("div");
+      item.className = "task-item";
 
-    // ✅ 勾选状态改变时发送 PATCH 请求
-    checkbox.onchange = async () => {
-      const done = checkbox.checked;
-      content.style.textDecoration = done ? "line-through" : "none";
-      await fetch(`${API_BASE}/api/tasks/${t.id}/done`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ done }),
-      });
-    };
+      const checkbox = document.createElement("input");
+      checkbox.type = "checkbox";
+      checkbox.checked = t.done;
+      checkbox.className = "task-checkbox";
 
-    item.appendChild(checkbox);
-    item.appendChild(content);
-    section.appendChild(item);
-  });
+      const content = document.createElement("span");
+      content.textContent = `📝 ${t.task} (${t.duration}小时)`;
+      if (t.done) content.style.textDecoration = "line-through";
+
+      checkbox.onchange = async () => {
+        const done = checkbox.checked;
+        content.style.textDecoration = done ? "line-through" : "none";
+        await fetch(`${API_BASE}/api/tasks/${t.id}/done`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ done }),
+        });
+        await loadTasks(); // ⚠️ 重新加载以刷新分组
+      };
+
+      item.appendChild(checkbox);
+      item.appendChild(content);
+      section.appendChild(item);
+    });
+  };
+
+  renderList(doneList, "✅ 已完成任务：");
+  renderList(undoneList, "🕒 未完成任务：");
 
   taskBoard.appendChild(section);
 }
+
 
   } catch (err) {
     taskBoard.innerHTML = "<p>连接失败，请稍后重试</p>";
