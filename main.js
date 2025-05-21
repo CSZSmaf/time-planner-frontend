@@ -97,22 +97,51 @@ async function loadTasks() {
     }
 
     taskBoard.innerHTML = "";
-    for (const date in grouped) {
-      const section = document.createElement("div");
-      section.className = "task-day";
-      const title = document.createElement("h3");
-      title.textContent = `📅 ${date}`;
-      section.appendChild(title);
+for (const date in grouped) {
+  const section = document.createElement("div");
+  section.className = "task-day";
 
-      grouped[date].forEach(t => {
-        const item = document.createElement("div");
-        item.className = "task-item";
-        item.innerHTML = `📝 ${t.task} <span class="duration">(${t.duration}小时)</span>`;
-        section.appendChild(item);
+  // ✅ 美化日期格式
+  const d = new Date(date);
+  const formattedDate = `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}-${d.getDate().toString().padStart(2, '0')}`;
+  const title = document.createElement("h3");
+  title.textContent = `📅 ${formattedDate}`;
+  section.appendChild(title);
+
+  grouped[date].forEach(t => {
+    const item = document.createElement("div");
+    item.className = "task-item";
+
+    // ✅ 创建复选框
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.checked = t.done; // 根据任务状态设置初始值
+    checkbox.className = "task-checkbox";
+
+    // ✅ 创建任务内容
+    const content = document.createElement("span");
+    content.textContent = `📝 ${t.task} (${t.duration}小时)`;
+    if (t.done) content.style.textDecoration = "line-through";
+
+    // ✅ 勾选状态改变时发送 PATCH 请求
+    checkbox.onchange = async () => {
+      const done = checkbox.checked;
+      content.style.textDecoration = done ? "line-through" : "none";
+      await fetch(`${API_BASE}/api/tasks/${t.id}/done`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ done }),
       });
+    };
 
-      taskBoard.appendChild(section);
-    }
+    item.appendChild(checkbox);
+    item.appendChild(content);
+    section.appendChild(item);
+  });
+
+  taskBoard.appendChild(section);
+}
+
   } catch (err) {
     taskBoard.innerHTML = "<p>连接失败，请稍后重试</p>";
   }

@@ -91,3 +91,11 @@ a {
   color: #6b7280;
   font-size: 13px;
 }
+.task-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.task-checkbox {
+  transform: scale(1.2);
+}
