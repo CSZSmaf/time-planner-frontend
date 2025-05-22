@@ -197,3 +197,37 @@ a:hover { text-decoration: underline; }
   .container { padding: 20px; margin-top: 20px; }
   #chat-box { width: 90vw; right: 5vw; height: 60vh; }
 }
+.edit-btn,
+.delete-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  padding: 4px;
+  margin-left: 6px;
+}
+
+.edit-btn:hover {
+  color: #2563eb; /* 蓝色高亮 */
+}
+
+.delete-btn:hover {
+  color: #dc2626; /* 红色高亮 */
+}
+
+.task-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.task-item .task-text {
+  flex: 1;
+  margin-left: 10px;
+}
+
+.task-item .duration {
+  margin-left: 10px;
+  color: #6b7280;
+  font-size: 13px;
+}

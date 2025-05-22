@@ -7,7 +7,6 @@
 </head>
 <body>
   <div class="container">
-
     <!-- 登录模块 -->
     <div id="login-section">
       <h2>登录你的学习账号</h2>
@@ -33,34 +32,76 @@
         <input type="text" id="goal-input" placeholder="请输入你的学习目标" />
         <button id="generate-plan">生成7天计划</button>
       </div>
+
       <!-- 手动添加任务区域 -->
       <div id="manual-add">
-      <h3>✍️ 手动添加任务</h3>
-      <input type="text" id="manual-task" placeholder="任务内容" />
-      <input type="date" id="manual-date" />
-      <input type="number" id="manual-duration" placeholder="时长 (小时)" min="0.5" step="0.5" />
-      <button id="add-task-btn">添加任务</button>
-</div>
+        <h3>✍️ 手动添加任务</h3>
+        <input type="text" id="manual-task" placeholder="任务内容" />
+        <input type="date" id="manual-date" />
+        <input type="number" id="manual-duration" placeholder="时长 (小时)" min="0.5" step="0.5" />
+        <button id="add-task-btn">添加任务</button>
+      </div>
 
       <div id="task-board"></div>
       <button id="logout-btn">退出登录</button>
     </div>
-
   </div>
-<!-- ✅ 聊天按钮 -->
-<div id="chat-toggle">🤖</div>
 
-<!-- ✅ 聊天窗口 -->
-<div id="chat-box" style="display: none;">
-  <div id="chat-messages"></div>
-  <div id="chat-input-area">
-    <input type="text" id="chat-input" placeholder="和AI聊聊吧..." />
-    <button id="chat-send">发送</button>
+  <!-- ✅ 编辑弹窗 -->
+  <div id="edit-modal" style="display:none; position:fixed; top:30%; left:50%; transform:translate(-50%, -50%); background:#fff; padding:20px; border:1px solid #ccc; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.2); z-index:1000;">
+    <h3>编辑任务</h3>
+    <input type="text" id="edit-task-text" placeholder="任务内容" />
+    <input type="number" id="edit-duration" step="0.5" min="0.5" placeholder="时长" />
+    <button id="save-edit">保存</button>
+    <button id="cancel-edit">取消</button>
   </div>
-</div>
 
-<!-- 页面最后，放在 </body> 前 -->
-<script src="main.js"></script>
+  <!-- ✅ 聊天按钮 -->
+  <div id="chat-toggle">🤖</div>
+
+  <!-- ✅ 聊天窗口 -->
+  <div id="chat-box" style="display: none;">
+    <div id="chat-messages"></div>
+    <div id="chat-input-area">
+      <input type="text" id="chat-input" placeholder="和AI聊聊吧..." />
+      <button id="chat-send">发送</button>
+    </div>
+  </div>
+
+  <script src="main.js"></script>
+  <script>
+    let currentEditTaskId = null;
+
+    document.addEventListener("click", (e) => {
+      if (e.target.classList.contains("edit-btn")) {
+        const item = e.target.closest(".task-item");
+        currentEditTaskId = item.dataset.id;
+        const taskText = item.querySelector(".task-text").textContent;
+        const durationText = item.querySelector(".duration").textContent;
+
+        document.getElementById("edit-task-text").value = taskText.replace(/^📝\s*/, "");
+        document.getElementById("edit-duration").value = parseFloat(durationText);
+        document.getElementById("edit-modal").style.display = "block";
+      }
+
+      if (e.target.id === "cancel-edit") {
+        document.getElementById("edit-modal").style.display = "none";
+      }
+    });
+
+    document.getElementById("save-edit").addEventListener("click", async () => {
+      const task = document.getElementById("edit-task-text").value;
+      const duration = parseFloat(document.getElementById("edit-duration").value);
+
+      await fetch(`${API_BASE}/api/tasks/${currentEditTaskId}`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ task, duration })
+      });
+
+      document.getElementById("edit-modal").style.display = "none";
+      loadTasks();
+    });
+  </script>
 </body>
-
 </html>

@@ -6,6 +6,7 @@ const planSection = document.getElementById("plan-section");
 const taskBoard = document.getElementById("task-board");
 
 let currentUserId = null;
+let currentEditTaskId = null;
 
 // 页面切换
 document.getElementById("go-register").onclick = () => {
@@ -67,113 +68,142 @@ document.getElementById("register-btn").onclick = async () => {
   }
 };
 
-// 显示主计划页
 async function showPlanSection() {
   loginSection.style.display = "none";
   registerSection.style.display = "none";
   planSection.style.display = "block";
-
   await loadTasks();
 }
 
-// 加载任务并渲染
 async function loadTasks() {
   taskBoard.innerHTML = "<p>正在加载任务...</p>";
-
   try {
     const res = await fetch(`${API_BASE}/api/tasks/${currentUserId}`);
     const data = await res.json();
 
-    if (!res.ok) {
-      taskBoard.innerHTML = "<p>加载任务失败</p>";
-      return;
-    }
-
-    const tasksArray = Array.isArray(data) ? data : data.tasks || [];
-
-    if (tasksArray.length === 0) {
-      taskBoard.innerHTML = "<p>暂无任务，请先生成或手动添加</p>";
-      return;
-    }
-
     const grouped = {};
-    for (const task of tasksArray) {
-      const dateKey = task.date;          // 后端字段如果叫 task_date，请改成 task.task_date
+    for (const task of data) {
+      const dateKey = task.date;
       if (!grouped[dateKey]) grouped[dateKey] = [];
       grouped[dateKey].push(task);
     }
 
     taskBoard.innerHTML = "";
+    for (const date in grouped) {
+      const section = document.createElement("div");
+      section.className = "task-day";
 
-for (const date in grouped) {
-  const section = document.createElement("div");
-  section.className = "task-day";
+      const d = new Date(date);
+      const title = document.createElement("h3");
+      title.textContent = `📅 ${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+      section.appendChild(title);
 
-  // ✅ 日期格式
-  const d = new Date(date);
-  const formattedDate = `${d.getFullYear()}-${(d.getMonth() + 1)
-    .toString()
-    .padStart(2, "0")}-${d.getDate().toString().padStart(2, "0")}`;
-  const title = document.createElement("h3");
-  title.textContent = `📅 ${formattedDate}`;
-  section.appendChild(title);
+      const doneList = grouped[date].filter((t) => t.done);
+      const undoneList = grouped[date].filter((t) => !t.done);
 
-  // ✅ 已完成和未完成分组
-  const doneList = grouped[date].filter((t) => t.done);
-  const undoneList = grouped[date].filter((t) => !t.done);
+      renderList(doneList, "✅ 已完成任务：", section);
+      renderList(undoneList, "🕒 未完成任务：", section);
 
-  // ✅ 渲染子任务函数
-  const renderList = (tasks, label) => {
-    if (tasks.length === 0) return;
-    const subTitle = document.createElement("p");
-    subTitle.textContent = label;
-    subTitle.style.fontWeight = "bold";
-    subTitle.style.margin = "8px 0 4px";
-    section.appendChild(subTitle);
-
-    tasks.forEach((t) => {
-      const item = document.createElement("div");
-      item.className = "task-item";
-
-      const checkbox = document.createElement("input");
-      checkbox.type = "checkbox";
-      checkbox.checked = t.done;
-      checkbox.className = "task-checkbox";
-
-      const content = document.createElement("span");
-      content.textContent = `📝 ${t.task} (${t.duration}小时)`;
-      if (t.done) content.style.textDecoration = "line-through";
-
-      checkbox.onchange = async () => {
-        const done = checkbox.checked;
-        content.style.textDecoration = done ? "line-through" : "none";
-        await fetch(`${API_BASE}/api/tasks/${t.id}/done`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ done }),
-        });
-        await loadTasks(); // ⚠️ 重新加载以刷新分组
-      };
-
-      item.appendChild(checkbox);
-      item.appendChild(content);
-      section.appendChild(item);
-    });
-  };
-
-  renderList(doneList, "✅ 已完成任务：");
-  renderList(undoneList, "🕒 未完成任务：");
-
-  taskBoard.appendChild(section);
-}
-
-
+      taskBoard.appendChild(section);
+    }
   } catch (err) {
     taskBoard.innerHTML = "<p>连接失败，请稍后重试</p>";
   }
 }
 
-// 生成 7 天计划
+function renderList(tasks, label, section) {
+  if (tasks.length === 0) return;
+  const subTitle = document.createElement("p");
+  subTitle.textContent = label;
+  subTitle.style.fontWeight = "bold";
+  subTitle.style.margin = "8px 0 4px";
+  section.appendChild(subTitle);
+
+  tasks.forEach((t) => {
+    const item = document.createElement("div");
+    item.className = "task-item";
+    item.dataset.id = t.id;
+
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.checked = t.done;
+    checkbox.className = "task-checkbox";
+
+    const content = document.createElement("span");
+    content.className = "task-text";
+    content.textContent = `📝 ${t.task}`;
+    if (t.done) content.style.textDecoration = "line-through";
+
+    const duration = document.createElement("span");
+    duration.className = "duration";
+    duration.textContent = t.duration;
+
+    const editBtn = document.createElement("button");
+    editBtn.className = "edit-btn";
+    editBtn.textContent = "✏️";
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.className = "delete-btn";
+    deleteBtn.textContent = "🗑️";
+    deleteBtn.style.color = "red";
+
+    checkbox.onchange = async () => {
+      const done = checkbox.checked;
+      await fetch(`${API_BASE}/api/tasks/${t.id}/done`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ done }),
+      });
+      await loadTasks();
+    };
+
+    editBtn.onclick = () => {
+      currentEditTaskId = t.id;
+      document.getElementById("edit-task-text").value = t.task;
+      document.getElementById("edit-duration").value = t.duration;
+      document.getElementById("edit-modal").style.display = "block";
+    };
+
+    deleteBtn.onclick = async () => {
+      if (confirm("确定要删除这个任务吗？")) {
+        await fetch(`${API_BASE}/api/tasks/${t.id}`, {
+          method: "DELETE",
+        });
+        await loadTasks();
+      }
+    };
+
+    item.appendChild(checkbox);
+    item.appendChild(content);
+    item.appendChild(duration);
+    item.appendChild(editBtn);
+    item.appendChild(deleteBtn);
+    section.appendChild(item);
+  });
+}
+
+
+// 保存编辑任务
+document.getElementById("save-edit").onclick = async () => {
+  const task = document.getElementById("edit-task-text").value;
+  const duration = parseFloat(document.getElementById("edit-duration").value);
+
+  await fetch(`${API_BASE}/api/tasks/${currentEditTaskId}`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ task, duration })
+  });
+
+  document.getElementById("edit-modal").style.display = "none";
+  loadTasks();
+};
+
+// 取消编辑
+document.getElementById("cancel-edit").onclick = () => {
+  document.getElementById("edit-modal").style.display = "none";
+};
+
+// 生成计划
 document.getElementById("generate-plan").onclick = async () => {
   const goal = document.getElementById("goal-input").value;
   if (!goal) return alert("请先填写学习目标");
@@ -197,13 +227,7 @@ document.getElementById("generate-plan").onclick = async () => {
   }
 };
 
-// 退出登录
-document.getElementById("logout-btn").onclick = () => {
-  currentUserId = null;
-  planSection.style.display = "none";
-  loginSection.style.display = "block";
-};
-// ✅ 手动添加任务
+// 添加任务
 document.getElementById("add-task-btn").onclick = async () => {
   const task = document.getElementById("manual-task").value.trim();
   const date = document.getElementById("manual-date").value;
@@ -218,21 +242,14 @@ document.getElementById("add-task-btn").onclick = async () => {
     const res = await fetch(`${API_BASE}/api/tasks`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        userId: currentUserId,
-        task,
-        duration,
-        date
-      }),
+      body: JSON.stringify({ userId: currentUserId, task, duration, date }),
     });
 
     if (res.ok) {
       alert("任务添加成功！");
-      // 清空表单
       document.getElementById("manual-task").value = "";
       document.getElementById("manual-date").value = "";
       document.getElementById("manual-duration").value = "";
-      // 重新加载任务
       await loadTasks();
     } else {
       alert("任务添加失败");
@@ -241,14 +258,20 @@ document.getElementById("add-task-btn").onclick = async () => {
     alert("网络错误，添加失败");
   }
 };
-// ✅ 聊天窗口展开与隐藏
-const chatToggle = document.getElementById("chat-toggle");
-const chatBox = document.getElementById("chat-box");
-chatToggle.onclick = () => {
+
+// 退出登录
+document.getElementById("logout-btn").onclick = () => {
+  currentUserId = null;
+  planSection.style.display = "none";
+  loginSection.style.display = "block";
+};
+
+// 聊天功能
+document.getElementById("chat-toggle").onclick = () => {
+  const chatBox = document.getElementById("chat-box");
   chatBox.style.display = chatBox.style.display === "none" ? "flex" : "none";
 };
 
-// ✅ 聊天发送
 document.getElementById("chat-send").onclick = async () => {
   const input = document.getElementById("chat-input");
   const msg = input.value.trim();
