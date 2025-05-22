@@ -153,6 +153,15 @@ function renderList(tasks, label, section) {
     focusBtn.className = "focus-btn";
     focusBtn.textContent = "🧘 专注";
 
+    const remindBtn = document.createElement("button");
+    remindBtn.textContent = "⏰ 设置提醒";
+    remindBtn.onclick = () => {
+      const time = prompt("请输入提醒时间（格式如：2025-05-21T15:30）", new Date().toISOString().slice(0, 16));
+      if (time) {
+        localStorage.setItem(`reminder_${t.id}`, time);
+        alert(`提醒已设置：${time.replace('T', ' ')}`);
+      }
+    };
     checkbox.onchange = async () => {
       const done = checkbox.checked;
       await fetch(`${API_BASE}/api/tasks/${t.id}/done`, {
@@ -192,6 +201,7 @@ function renderList(tasks, label, section) {
     item.appendChild(checkbox);
     item.appendChild(content);
     item.appendChild(duration);
+    item.appendChild(remindBtn);
     item.appendChild(focusBtn);
     item.appendChild(editBtn);
     item.appendChild(deleteBtn);
@@ -358,5 +368,27 @@ function appendMessage(sender, text) {
   chat.appendChild(entry);
   chat.scrollTop = chat.scrollHeight;
 }
+// 初始化通知权限
+if ("Notification" in window && Notification.permission !== "granted") {
+  Notification.requestPermission();
+}
+
+// 每 30 秒轮询提醒列表
+setInterval(() => {
+  if ("Notification" in window && Notification.permission === "granted") {
+    const now = new Date();
+    for (let key in localStorage) {
+      if (key.startsWith("reminder_")) {
+        const time = new Date(localStorage.getItem(key));
+        if (Math.abs(time - now) < 30000) {
+          const taskId = key.replace("reminder_", "");
+          const taskText = document.querySelector(`[data-id='${taskId}'] .task-text`)?.textContent || "某个任务";
+          new Notification("⏰ 时间到啦！", { body: `请开始：${taskText}` });
+          localStorage.removeItem(key); // 提醒后移除
+        }
+      }
+    }
+  }
+}, 30000);
 
 
