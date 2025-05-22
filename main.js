@@ -7,7 +7,7 @@ const taskBoard = document.getElementById("task-board");
 
 let currentUserId = null;
 let currentEditTaskId = null;
-
+const timers = {}; // 保存所有任务的计时器状态
 // 页面切换
 document.getElementById("go-register").onclick = () => {
   loginSection.style.display = "none";
@@ -136,7 +136,7 @@ function renderList(tasks, label, section) {
 
     const duration = document.createElement("span");
     duration.className = "duration";
-    duration.textContent = t.duration;
+    duration.textContent = `${t.duration}h`;
 
     const editBtn = document.createElement("button");
     editBtn.className = "edit-btn";
@@ -146,6 +146,52 @@ function renderList(tasks, label, section) {
     deleteBtn.className = "delete-btn";
     deleteBtn.textContent = "🗑️";
     deleteBtn.style.color = "red";
+
+    const startBtn = document.createElement("button");
+    startBtn.className = "start-btn";
+    startBtn.textContent = "▶️";
+
+    const progressContainer = document.createElement("div");
+    progressContainer.className = "progress-container";
+    const progressBar = document.createElement("div");
+    progressBar.className = "progress-bar";
+    progressContainer.appendChild(progressBar);
+
+    let elapsed = t.elapsed_seconds || 0;
+    let running = false;
+    let intervalId = null;
+
+    function updateProgressBar() {
+      const total = t.duration * 3600;
+      const percent = Math.min(100, (elapsed / total) * 100);
+      progressBar.style.width = `${percent}%`;
+    }
+
+    updateProgressBar();
+
+    startBtn.onclick = () => {
+      if (running) {
+        clearInterval(intervalId);
+        clearInterval(timers[t.id]);
+        running = false;
+        startBtn.textContent = "▶️";
+      } else {
+        running = true;
+        startBtn.textContent = "⏸️";
+        intervalId = setInterval(() => {
+          elapsed++;
+          updateProgressBar();
+        }, 1000);
+
+        timers[t.id] = setInterval(async () => {
+          await fetch(`${API_BASE}/api/tasks/${t.id}/elapsed`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ elapsed }),
+          });
+        }, 60000);
+      }
+    };
 
     checkbox.onchange = async () => {
       const done = checkbox.checked;
@@ -166,9 +212,9 @@ function renderList(tasks, label, section) {
 
     deleteBtn.onclick = async () => {
       if (confirm("确定要删除这个任务吗？")) {
+        if (timers[t.id]) clearInterval(timers[t.id]);
         await fetch(`${API_BASE}/api/tasks/${t.id}`, {
-          method: "DELETE",
-        });
+          method: "DELETE" });
         await loadTasks();
       }
     };
@@ -176,6 +222,8 @@ function renderList(tasks, label, section) {
     item.appendChild(checkbox);
     item.appendChild(content);
     item.appendChild(duration);
+    item.appendChild(startBtn);
+    item.appendChild(progressContainer);
     item.appendChild(editBtn);
     item.appendChild(deleteBtn);
     section.appendChild(item);
@@ -300,3 +348,5 @@ function appendMessage(sender, text) {
   chat.appendChild(entry);
   chat.scrollTop = chat.scrollHeight;
 }
+
+
