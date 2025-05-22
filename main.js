@@ -7,7 +7,9 @@ const taskBoard = document.getElementById("task-board");
 
 let currentUserId = null;
 let currentEditTaskId = null;
-const timers = {}; // 保存所有任务的计时器状态
+let focusInterval = null;
+let currentFocusTask = null;
+let currentElapsed = 0;
 // 页面切换
 document.getElementById("go-register").onclick = () => {
   loginSection.style.display = "none";
@@ -147,51 +149,9 @@ function renderList(tasks, label, section) {
     deleteBtn.textContent = "🗑️";
     deleteBtn.style.color = "red";
 
-    const startBtn = document.createElement("button");
-    startBtn.className = "start-btn";
-    startBtn.textContent = "▶️";
-
-    const progressContainer = document.createElement("div");
-    progressContainer.className = "progress-container";
-    const progressBar = document.createElement("div");
-    progressBar.className = "progress-bar";
-    progressContainer.appendChild(progressBar);
-
-    let elapsed = t.elapsed_seconds || 0;
-    let running = false;
-    let intervalId = null;
-
-    function updateProgressBar() {
-      const total = t.duration * 3600;
-      const percent = Math.min(100, (elapsed / total) * 100);
-      progressBar.style.width = `${percent}%`;
-    }
-
-    updateProgressBar();
-
-    startBtn.onclick = () => {
-      if (running) {
-        clearInterval(intervalId);
-        clearInterval(timers[t.id]);
-        running = false;
-        startBtn.textContent = "▶️";
-      } else {
-        running = true;
-        startBtn.textContent = "⏸️";
-        intervalId = setInterval(() => {
-          elapsed++;
-          updateProgressBar();
-        }, 1000);
-
-        timers[t.id] = setInterval(async () => {
-          await fetch(`${API_BASE}/api/tasks/${t.id}/elapsed`, {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ elapsed }),
-          });
-        }, 60000);
-      }
-    };
+    const focusBtn = document.createElement("button");
+    focusBtn.className = "focus-btn";
+    focusBtn.textContent = "🧘 专注";
 
     checkbox.onchange = async () => {
       const done = checkbox.checked;
@@ -212,24 +172,70 @@ function renderList(tasks, label, section) {
 
     deleteBtn.onclick = async () => {
       if (confirm("确定要删除这个任务吗？")) {
-        if (timers[t.id]) clearInterval(timers[t.id]);
-        await fetch(`${API_BASE}/api/tasks/${t.id}`, {
-          method: "DELETE" });
+        await fetch(`${API_BASE}/api/tasks/${t.id}`, { method: "DELETE" });
         await loadTasks();
       }
+    };
+
+    focusBtn.onclick = () => {
+  currentFocusTask = t;
+  currentElapsed = t.elapsed_seconds || 0;
+  document.getElementById("focus-time").textContent = formatTime(currentElapsed);
+  document.getElementById("focus-modal").style.display = "flex";
+
+  // 进入全屏
+  document.documentElement.requestFullscreen?.();
+
+  startFocusTimer();
     };
 
     item.appendChild(checkbox);
     item.appendChild(content);
     item.appendChild(duration);
-    item.appendChild(startBtn);
-    item.appendChild(progressContainer);
+    item.appendChild(focusBtn);
     item.appendChild(editBtn);
     item.appendChild(deleteBtn);
     section.appendChild(item);
   });
 }
 
+function formatTime(seconds) {
+  const h = String(Math.floor(seconds / 3600)).padStart(2, '0');
+  const m = String(Math.floor((seconds % 3600) / 60)).padStart(2, '0');
+  const s = String(seconds % 60).padStart(2, '0');
+  return `${h}:${m}:${s}`;
+}
+
+function startFocusTimer() {
+  const timeDisplay = document.getElementById("focus-time");
+  clearInterval(focusInterval);
+  focusInterval = setInterval(() => {
+    currentElapsed++;
+    timeDisplay.textContent = formatTime(currentElapsed);
+  }, 1000);
+
+  // 每 60 秒同步一次
+  setInterval(async () => {
+    if (currentFocusTask) {
+      await fetch(`${API_BASE}/api/tasks/${currentFocusTask.id}/elapsed`, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ elapsed: currentElapsed })
+      });
+    }
+  }, 60000);
+}
+
+// 专注弹窗控制
+function closeFocus() {
+  clearInterval(focusInterval);
+  document.getElementById("focus-modal").style.display = "none";
+  focusInterval = null;
+  currentFocusTask = null;
+
+  // 退出全屏
+  document.exitFullscreen?.();
+}
 
 // 保存编辑任务
 document.getElementById("save-edit").onclick = async () => {

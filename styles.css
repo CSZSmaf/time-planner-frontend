@@ -246,3 +246,33 @@ a:hover { text-decoration: underline; }
   width: 0%;
   transition: width 0.3s ease;
 }
+#focus-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: white;
+  color: #111827;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+#focus-time {
+  font-size: 72px;
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+#focus-modal button {
+  font-size: 20px;
+  padding: 10px 20px;
+  background: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
