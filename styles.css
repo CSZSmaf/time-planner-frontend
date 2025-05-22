@@ -276,3 +276,18 @@ a:hover { text-decoration: underline; }
   border-radius: 6px;
   cursor: pointer;
 }
+.markdown {
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.markdown h3 {
+  font-size: 16px;
+  margin-top: 12px;
+}
+
+.markdown code {
+  background-color: #f3f3f3;
+  padding: 2px 4px;
+  border-radius: 4px;
+}

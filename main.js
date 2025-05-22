@@ -350,7 +350,7 @@ document.getElementById("chat-send").onclick = async () => {
 function appendMessage(sender, text) {
   const chat = document.getElementById("chat-messages");
   const entry = document.createElement("div");
-  entry.innerHTML = `<strong>${sender}</strong> ${text}`;
+  entry.innerHTML = `<strong>${sender}</strong><div class="markdown">${marked.parse(text)}</div>`;
   chat.appendChild(entry);
   chat.scrollTop = chat.scrollHeight;
 }
