@@ -126,6 +126,11 @@ function renderList(tasks, label, section) {
     item.className = "task-item";
     item.dataset.id = t.id;
 
+    const leftSide = document.createElement("div");
+    leftSide.style.display = "flex";
+    leftSide.style.alignItems = "center";
+    leftSide.style.gap = "10px";
+
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
     checkbox.checked = t.done;
@@ -140,21 +145,15 @@ function renderList(tasks, label, section) {
     duration.className = "duration";
     duration.textContent = `${t.duration}h`;
 
-    const editBtn = document.createElement("button");
-    editBtn.className = "edit-btn";
-    editBtn.textContent = "✏️";
+    leftSide.appendChild(checkbox);
+    leftSide.appendChild(content);
+    leftSide.appendChild(duration);
 
-    const deleteBtn = document.createElement("button");
-    deleteBtn.className = "delete-btn";
-    deleteBtn.textContent = "🗑️";
-    deleteBtn.style.color = "red";
-
-    const focusBtn = document.createElement("button");
-    focusBtn.className = "focus-btn";
-    focusBtn.textContent = "🧘 专注";
+    const actions = document.createElement("div");
+    actions.className = "task-actions";
 
     const remindBtn = document.createElement("button");
-    remindBtn.textContent = "⏰ 设置提醒";
+    remindBtn.textContent = "⏰ 提醒";
     remindBtn.onclick = () => {
       const time = prompt("请输入提醒时间（格式如：2025-05-21T15:30）", new Date().toISOString().slice(0, 16));
       if (time) {
@@ -162,6 +161,36 @@ function renderList(tasks, label, section) {
         alert(`提醒已设置：${time.replace('T', ' ')}`);
       }
     };
+
+    const focusBtn = document.createElement("button");
+    focusBtn.textContent = "🧘 专注";
+    focusBtn.onclick = () => {
+      currentFocusTask = t;
+      currentElapsed = t.elapsed_seconds || 0;
+      document.getElementById("focus-time").textContent = formatTime(currentElapsed);
+      document.getElementById("focus-modal").style.display = "flex";
+      document.documentElement.requestFullscreen?.();
+      startFocusTimer();
+    };
+
+    const editBtn = document.createElement("button");
+    editBtn.textContent = "✏️";
+    editBtn.onclick = () => {
+      currentEditTaskId = t.id;
+      document.getElementById("edit-task-text").value = t.task;
+      document.getElementById("edit-duration").value = t.duration;
+      document.getElementById("edit-modal").style.display = "block";
+    };
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.textContent = "🗑️";
+    deleteBtn.onclick = async () => {
+      if (confirm("确定要删除这个任务吗？")) {
+        await fetch(`${API_BASE}/api/tasks/${t.id}`, { method: "DELETE" });
+        await loadTasks();
+      }
+    };
+
     checkbox.onchange = async () => {
       const done = checkbox.checked;
       await fetch(`${API_BASE}/api/tasks/${t.id}/done`, {
@@ -172,39 +201,13 @@ function renderList(tasks, label, section) {
       await loadTasks();
     };
 
-    editBtn.onclick = () => {
-      currentEditTaskId = t.id;
-      document.getElementById("edit-task-text").value = t.task;
-      document.getElementById("edit-duration").value = t.duration;
-      document.getElementById("edit-modal").style.display = "block";
-    };
+    actions.appendChild(remindBtn);
+    actions.appendChild(focusBtn);
+    actions.appendChild(editBtn);
+    actions.appendChild(deleteBtn);
 
-    deleteBtn.onclick = async () => {
-      if (confirm("确定要删除这个任务吗？")) {
-        await fetch(`${API_BASE}/api/tasks/${t.id}`, { method: "DELETE" });
-        await loadTasks();
-      }
-    };
-
-    focusBtn.onclick = () => {
-  currentFocusTask = t;
-  currentElapsed = t.elapsed_seconds || 0;
-  document.getElementById("focus-time").textContent = formatTime(currentElapsed);
-  document.getElementById("focus-modal").style.display = "flex";
-
-  // 进入全屏
-  document.documentElement.requestFullscreen?.();
-
-  startFocusTimer();
-    };
-
-    item.appendChild(checkbox);
-    item.appendChild(content);
-    item.appendChild(duration);
-    item.appendChild(remindBtn);
-    item.appendChild(focusBtn);
-    item.appendChild(editBtn);
-    item.appendChild(deleteBtn);
+    item.appendChild(leftSide);
+    item.appendChild(actions);
     section.appendChild(item);
   });
 }

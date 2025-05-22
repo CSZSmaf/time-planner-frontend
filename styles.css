@@ -291,3 +291,36 @@ a:hover { text-decoration: underline; }
   padding: 2px 4px;
   border-radius: 4px;
 }
+.task-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 10px 14px;
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  margin: 8px 0;
+}
+
+.task-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.task-actions button {
+  padding: 6px 10px;
+  font-size: 14px;
+  border: none;
+  border-radius: 4px;
+  background-color: #e5e7eb;
+  color: #111827;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.task-actions button:hover {
+  background-color: #d1d5db;
+}
