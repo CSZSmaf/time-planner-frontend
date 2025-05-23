@@ -321,3 +321,22 @@ a:hover { text-decoration: underline; }
 .task-day > div {
   margin-left: 16px;
 }
+.history-section {
+  margin-top: 30px;
+  padding: 16px;
+  background-color: #f9fafb;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+}
+.history-section h3 {
+  margin-bottom: 12px;
+  font-size: 16px;
+  color: #4b5563;
+}
+.history-item {
+  padding: 6px 0;
+  font-size: 14px;
+  color: #6b7280;
+  border-left: 3px solid #a5b4fc;
+  padding-left: 10px;
+}

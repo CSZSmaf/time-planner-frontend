@@ -84,34 +84,36 @@ async function loadTasks() {
     const res = await fetch(`${API_BASE}/api/tasks/${currentUserId}`);
     const data = await res.json();
 
-    // 按日期分组
+    const today = new Date().toISOString().slice(0, 10);
+
+    // 1️⃣ 分离历史已完成任务
+    const historyCompleted = data.filter(task => task.done && task.date.slice(0, 10) < today);
+    const mainTasks = data.filter(task => !(task.done && task.date.slice(0, 10) < today));
+
+    // 2️⃣ 按日期分组 mainTasks
     const grouped = {};
-    for (const task of data) {
+    for (const task of mainTasks) {
       const dateKey = task.date.slice(0, 10);
       if (!grouped[dateKey]) grouped[dateKey] = [];
       grouped[dateKey].push(task);
     }
 
     taskBoard.innerHTML = "";
-    const today = new Date().toISOString().slice(0, 10);
 
+    // 3️⃣ 渲染日期分组任务
     for (const date in grouped) {
       const section = document.createElement("div");
       section.className = "task-day";
 
-      // 标题
       const d = new Date(date);
       const title = document.createElement("h3");
       title.textContent = `📅 ${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
       section.appendChild(title);
 
-      // 判断是否为今天
       const isToday = date === today;
-      // 列表容器
       const listContainer = document.createElement("div");
       listContainer.style.display = isToday ? "block" : "none";
 
-      // 展开/收起按钮
       const toggleBtn = document.createElement("button");
       toggleBtn.textContent = isToday ? "收起" : "展开";
       toggleBtn.style.margin = "4px 0";
@@ -127,7 +129,6 @@ async function loadTasks() {
       section.appendChild(toggleBtn);
       section.appendChild(listContainer);
 
-      // 渲染已完成 & 未完成
       const doneList = grouped[date].filter((t) => t.done);
       const undoneList = grouped[date].filter((t) => !t.done);
       renderList(doneList, "✅ 已完成任务：", listContainer);
@@ -135,10 +136,31 @@ async function loadTasks() {
 
       taskBoard.appendChild(section);
     }
+
+    // 4️⃣ 渲染历史任务列表
+    if (historyCompleted.length > 0) {
+      const historySection = document.createElement("div");
+      historySection.className = "history-section";
+
+      const historyTitle = document.createElement("h3");
+      historyTitle.textContent = "📜 历史已完成任务";
+      historySection.appendChild(historyTitle);
+
+      historyCompleted.forEach(t => {
+        const item = document.createElement("div");
+        item.className = "history-item";
+        item.textContent = `${t.date.slice(0,10)} - ${t.task} (${t.duration}h)`;
+        historySection.appendChild(item);
+      });
+
+      taskBoard.appendChild(historySection);
+    }
+
   } catch (err) {
     taskBoard.innerHTML = "<p>连接失败，请稍后重试</p>";
   }
 }
+
 
 // 渲染任务列表至指定容器
 function renderList(tasks, label, container) {
