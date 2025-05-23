@@ -340,9 +340,6 @@ a:hover { text-decoration: underline; }
   border-left: 3px solid #a5b4fc;
   padding-left: 10px;
 }
-/* ✅ 整体结构，历史栏固定 + 主体居中 */
-.page-layout {
-}
 
 /* ✅ 左侧历史栏 */
 #sidebar-history {
