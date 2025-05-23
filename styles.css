@@ -340,48 +340,38 @@ a:hover { text-decoration: underline; }
   border-left: 3px solid #a5b4fc;
   padding-left: 10px;
 }
-/* 页面主布局 */
+/* ✅ 整体结构，历史栏固定 + 主体居中 */
 .page-layout {
-  display: flex;
-  align-items: flex-start;
+  display: grid;
+  grid-template-columns: 200px 1fr;
   min-height: 100vh;
   background-color: #f9fafb;
 }
 
-/* 左边栏：历史任务 */
+/* ✅ 左侧历史栏 */
 #sidebar-history {
-  width: 180px;
-  padding: 16px;
+  padding: 20px;
   background-color: #f8fafc;
   border-right: 1px solid #e5e7eb;
   height: 100vh;
   overflow-y: auto;
   position: sticky;
   top: 0;
-  flex-shrink: 0;
 }
 
-/* 右侧主内容区域：不挤满剩余，而是居中 */
+/* ✅ 主区域居中：核心点 */
 .main-content {
   display: flex;
   justify-content: center;
-  flex-grow: 1;
   padding: 40px 20px;
 }
 
-/* 保证 .container 宽度适中、居中对齐 */
+/* ✅ 内容卡片样式 */
 .main-content .container {
-  max-width: 640px;
+  max-width: 700px;
   width: 100%;
-  background-color: #ffffff;
+  background: #fff;
   padding: 30px;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-}
-#sidebar-history .history-section {
-  background-color: #fff;
-  border-radius: 8px;
-  padding: 12px;
-  border: 1px solid #e5e7eb;
-  margin-top: 40px;
+  border-radius: 12px;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
 }
