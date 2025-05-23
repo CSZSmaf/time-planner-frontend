@@ -7,59 +7,59 @@
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
+  <!-- 登录与注册 -->
   <div id="auth-container">
-  <div class="container">
-    <!-- 登录模块 -->
-    <div id="login-section">
-      <h2>登录你的学习账号</h2>
-      <input type="email" id="login-email" placeholder="邮箱" />
-      <input type="password" id="login-password" placeholder="密码" />
-      <button id="login-btn">登录</button>
-      <p>还没有账号？<a href="#" id="go-register">点击注册</a></p>
-    </div>
-
-    <!-- 注册模块 -->
-    <div id="register-section" style="display:none;">
-      <h2>注册新账号</h2>
-      <input type="email" id="register-email" placeholder="邮箱" />
-      <input type="password" id="register-password" placeholder="密码" />
-      <button id="register-btn">注册</button>
-      <p>已有账号？<a href="#" id="go-login">返回登录</a></p>
-    </div>
-    </div>
-  </div>
-  <div class="page-layout" id="main-layout" style="display: none;">
-    <!-- 左侧历史任务栏 -->
-    <aside id="sidebar-history"></aside>
-
-    <!-- 主体内容 -->
-    <main class="main-content">
-      <div class="container">
-    <!-- 主计划页面 -->
-    <div id="plan-section" style="display:none;">
-      <h2>你的计划任务</h2>
-      <div>
-        <input type="text" id="goal-input" placeholder="请输入你的学习目标" />
-        <button id="generate-plan">生成7天计划</button>
+    <div class="container">
+      <!-- 登录模块 -->
+      <div id="login-section">
+        <h2>登录你的学习账号</h2>
+        <input type="email" id="login-email" placeholder="邮箱" />
+        <input type="password" id="login-password" placeholder="密码" />
+        <button id="login-btn">登录</button>
+        <p>还没有账号？<a href="#" id="go-register">点击注册</a></p>
       </div>
 
-      <!-- 手动添加任务区域 -->
-      <div id="manual-add">
-        <h3>✍️ 手动添加任务</h3>
-        <input type="text" id="manual-task" placeholder="任务内容" />
-        <input type="date" id="manual-date" />
-        <input type="number" id="manual-duration" placeholder="时长 (小时)" min="0.5" step="0.5" />
-        <button id="add-task-btn">添加任务</button>
+      <!-- 注册模块 -->
+      <div id="register-section" style="display:none;">
+        <h2>注册新账号</h2>
+        <input type="email" id="register-email" placeholder="邮箱" />
+        <input type="password" id="register-password" placeholder="密码" />
+        <button id="register-btn">注册</button>
+        <p>已有账号？<a href="#" id="go-login">返回登录</a></p>
       </div>
-
-      <div id="task-board"></div>
-      <button id="logout-btn">退出登录</button>
     </div>
   </div>
-</main>
+
+  <!-- 历史任务栏 -->
+  <aside id="sidebar-history"></aside>
+
+  <!-- 主体内容区域 -->
+  <div id="main-layout" class="main-content" style="display: none;">
+    <div class="container">
+      <!-- 主计划页面 -->
+      <div id="plan-section" style="display:none;">
+        <h2>你的计划任务</h2>
+        <div>
+          <input type="text" id="goal-input" placeholder="请输入你的学习目标" />
+          <button id="generate-plan">生成7天计划</button>
+        </div>
+
+        <!-- 手动添加任务区域 -->
+        <div id="manual-add">
+          <h3>✍️ 手动添加任务</h3>
+          <input type="text" id="manual-task" placeholder="任务内容" />
+          <input type="date" id="manual-date" />
+          <input type="number" id="manual-duration" placeholder="时长 (小时)" min="0.5" step="0.5" />
+          <button id="add-task-btn">添加任务</button>
+        </div>
+
+        <div id="task-board"></div>
+        <button id="logout-btn">退出登录</button>
+      </div>
+    </div>
   </div>
 
-  <!-- ✅ 编辑弹窗 -->
+  <!-- 编辑弹窗 -->
   <div id="edit-modal" style="display:none; position:fixed; top:30%; left:50%; transform:translate(-50%, -50%); background:#fff; padding:20px; border:1px solid #ccc; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.2); z-index:1000;">
     <h3>编辑任务</h3>
     <input type="text" id="edit-task-text" placeholder="任务内容" />
@@ -68,10 +68,10 @@
     <button id="cancel-edit">取消</button>
   </div>
 
-  <!-- ✅ 聊天按钮 -->
+  <!-- 聊天按钮 -->
   <div id="chat-toggle">🤖</div>
 
-  <!-- ✅ 聊天窗口 -->
+  <!-- 聊天窗口 -->
   <div id="chat-box" style="display: none;">
     <div id="chat-messages"></div>
     <div id="chat-input-area">
@@ -80,6 +80,13 @@
     </div>
   </div>
 
+  <!-- 专注弹窗 -->
+  <div id="focus-modal" style="display: none;">
+    <div id="focus-time">00:00:00</div>
+    <button onclick="closeFocus()">❌ 退出专注</button>
+  </div>
+
+  <!-- 脚本 -->
   <script src="main.js"></script>
   <script>
     let currentEditTaskId = null;
@@ -115,11 +122,5 @@
       loadTasks();
     });
   </script>
-  <!-- 专注模式弹窗 -->
-<div id="focus-modal" style="display: none;">
-  <div id="focus-time">00:00:00</div>
-  <button onclick="closeFocus()">❌ 退出专注</button>
-</div>
-
 </body>
 </html>

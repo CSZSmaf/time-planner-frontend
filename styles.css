@@ -342,29 +342,29 @@ a:hover { text-decoration: underline; }
 }
 /* ✅ 整体结构，历史栏固定 + 主体居中 */
 .page-layout {
-  display: grid;
-  grid-template-columns: 200px 1fr;
-  min-height: 100vh;
-  background-color: #f9fafb;
 }
 
 /* ✅ 左侧历史栏 */
 #sidebar-history {
-  padding: 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 200px;
+  height: 100vh;
   background-color: #f8fafc;
   border-right: 1px solid #e5e7eb;
-  height: 100vh;
+  padding: 20px;
   overflow-y: auto;
-  position: sticky;
-  top: 0;
+  z-index: 10;
 }
 
-/* ✅ 主区域居中：核心点 */
 .main-content {
+  margin-left: 200px; /* 给左栏让出位置 */
   display: flex;
   justify-content: center;
   padding: 40px 20px;
 }
+
 
 /* ✅ 内容卡片样式 */
 .main-content .container {
