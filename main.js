@@ -71,12 +71,17 @@ document.getElementById("register-btn").onclick = async () => {
   }
 };
 
-function showPlanSection() {
+async function showPlanSection() {
+  // 新结构中正确控制显示的容器
   document.getElementById("auth-container").style.display = "none";
-  document.getElementById("main-layout").style.display = "flex"; // 显示登录后的整体布局
+  document.getElementById("main-layout").style.display = "flex";
+
+  // 这一句不是必须，但用于保险起见让计划区显现
   document.getElementById("plan-section").style.display = "block";
-  loadTasks();
+
+  await loadTasks();
 }
+
 
 
 async function loadTasks() {
