@@ -340,11 +340,15 @@ a:hover { text-decoration: underline; }
   border-left: 3px solid #a5b4fc;
   padding-left: 10px;
 }
+/* 页面主布局 */
 .page-layout {
   display: flex;
+  align-items: flex-start;
   min-height: 100vh;
+  background-color: #f9fafb;
 }
 
+/* 左边栏：历史任务 */
 #sidebar-history {
   width: 180px;
   padding: 16px;
@@ -357,26 +361,27 @@ a:hover { text-decoration: underline; }
   flex-shrink: 0;
 }
 
+/* 右侧主内容区域：不挤满剩余，而是居中 */
+.main-content {
+  display: flex;
+  justify-content: center;
+  flex-grow: 1;
+  padding: 40px 20px;
+}
+
+/* 保证 .container 宽度适中、居中对齐 */
+.main-content .container {
+  max-width: 640px;
+  width: 100%;
+  background-color: #ffffff;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+}
 #sidebar-history .history-section {
   background-color: #fff;
   border-radius: 8px;
   padding: 12px;
-  border: 1px solid #d1d5db;
-}
-#sidebar-history .history-section h3 {
-  margin-bottom: 10px;
-  font-size: 15px;
-  color: #374151;
-}
-#sidebar-history .history-item {
-  font-size: 14px;
-  margin-bottom: 6px;
-  border-left: 3px solid #a5b4fc;
-  padding-left: 8px;
-  color: #6b7280;
-}
-
-.main-content {
-  flex: 1;
-  padding: 40px;
+  border: 1px solid #e5e7eb;
+  margin-top: 40px;
 }
