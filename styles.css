@@ -340,3 +340,36 @@ a:hover { text-decoration: underline; }
   border-left: 3px solid #a5b4fc;
   padding-left: 10px;
 }
+.task-board-wrapper {
+  display: flex;
+  gap: 20px;
+  align-items: flex-start;
+}
+
+/* 任务主区（右侧） */
+#task-board {
+  flex: 1;
+}
+
+/* 历史任务区（左侧） */
+.history-section {
+  flex: 0 0 220px;
+  padding: 16px;
+  background-color: #f9fafb;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  max-height: 600px;
+  overflow-y: auto;
+}
+.history-section h3 {
+  font-size: 16px;
+  margin-bottom: 12px;
+  color: #4b5563;
+}
+.history-item {
+  font-size: 14px;
+  color: #6b7280;
+  margin: 4px 0;
+  padding-left: 10px;
+  border-left: 3px solid #a5b4fc;
+}

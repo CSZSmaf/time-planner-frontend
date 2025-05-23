@@ -154,7 +154,8 @@ async function loadTasks() {
         historySection.appendChild(item);
       });
 
-      taskBoard.appendChild(historySection);
+      taskBoard.parentElement.insertBefore(historySection, taskBoard);
+
     }
 
   } catch (err) {
