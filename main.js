@@ -88,7 +88,8 @@ async function loadTasks() {
 
     // 1️⃣ 分离历史已完成任务
     const historyCompleted = data.filter(task => task.done && task.date.slice(0, 10) < today);
-    const mainTasks = data.filter(task => !(task.done && task.date.slice(0, 10) < today));
+    const mainTasks = data.filter(task => task.date.slice(0, 10) >= today);
+
 
     // 2️⃣ 按日期分组 mainTasks
     const grouped = {};
