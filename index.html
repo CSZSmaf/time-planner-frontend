@@ -7,6 +7,11 @@
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
+  <!-- 页面整体布局 -->
+<div class="page-layout">
+  <!-- 左侧历史任务栏 -->
+  <aside id="sidebar-history"></aside>
+  
   <div class="container">
     <!-- 登录模块 -->
     <div id="login-section">
@@ -43,14 +48,11 @@
         <button id="add-task-btn">添加任务</button>
       </div>
 
-        <div class="task-layout">
-    <div id="history-wrapper"></div> <!-- 左侧历史区 -->
-    <div id="task-board"></div>       <!-- 右侧主任务区 -->
-  </div>
+      <div id="task-board"></div>
       <button id="logout-btn">退出登录</button>
     </div>
   </div>
-
+<div>
   <!-- ✅ 编辑弹窗 -->
   <div id="edit-modal" style="display:none; position:fixed; top:30%; left:50%; transform:translate(-50%, -50%); background:#fff; padding:20px; border:1px solid #ccc; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.2); z-index:1000;">
     <h3>编辑任务</h3>

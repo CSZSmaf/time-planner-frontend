@@ -154,8 +154,9 @@ async function loadTasks() {
         historySection.appendChild(item);
       });
 
-      document.getElementById("history-wrapper").innerHTML = "";
-document.getElementById("history-wrapper").appendChild(historySection);
+      const sidebar = document.getElementById("sidebar-history");
+sidebar.innerHTML = "";
+sidebar.appendChild(historySection);
 
     }
 
