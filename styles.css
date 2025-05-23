@@ -368,10 +368,23 @@ a:hover { text-decoration: underline; }
 
 /* ✅ 内容卡片样式 */
 .main-content .container {
-  max-width: 700px;
+  max-width: 900px;
   width: 100%;
   background: #fff;
   padding: 30px;
   border-radius: 12px;
   box-shadow: 0 0 12px rgba(0, 0, 0, 0.05);
+}
+#sidebar-history {
+  display: none; /* 默认不显示 */
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 200px;
+  height: 100vh;
+  background-color: #f8fafc;
+  border-right: 1px solid #e5e7eb;
+  padding: 20px;
+  overflow-y: auto;
+  z-index: 10;
 }
