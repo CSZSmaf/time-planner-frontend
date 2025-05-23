@@ -1,76 +1,100 @@
-<!DOCTYPE html>
-<html lang="zh">
+<!doctype html>
+<html lang="zh-CN">
 <head>
   <meta charset="UTF-8" />
-  <title>AI时间规划</title>
-  <link rel="stylesheet" href="styles.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AI 时间规划</title>
+
+  <!-- Fonts & Styles -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/styles.css" />
+  <!-- Marked (Markdown ➜ HTML) -->
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body>
+  <!-- 🌟 Main App Container -->
   <div class="container">
-    <!-- 登录模块 -->
-    <div id="login-section">
+    <!-- 🔐 登录模块 -->
+    <section id="login-section">
       <h2>登录你的学习账号</h2>
-      <input type="email" id="login-email" placeholder="邮箱" />
-      <input type="password" id="login-password" placeholder="密码" />
-      <button id="login-btn">登录</button>
-      <p>还没有账号？<a href="#" id="go-register">点击注册</a></p>
-    </div>
+      <input type="email" id="login-email" placeholder="邮箱" class="input" />
+      <input type="password" id="login-password" placeholder="密码" class="input" />
+      <button id="login-btn" class="btn btn-primary w-full mt-3">登录</button>
+      <p class="text-sm mt-4">还没有账号？<a href="#" id="go-register" class="link">点击注册</a></p>
+    </section>
 
-    <!-- 注册模块 -->
-    <div id="register-section" style="display:none;">
+    <!-- 🆕 注册模块 -->
+    <section id="register-section" style="display:none;">
       <h2>注册新账号</h2>
-      <input type="email" id="register-email" placeholder="邮箱" />
-      <input type="password" id="register-password" placeholder="密码" />
-      <button id="register-btn">注册</button>
-      <p>已有账号？<a href="#" id="go-login">返回登录</a></p>
-    </div>
+      <input type="email" id="register-email" placeholder="邮箱" class="input" />
+      <input type="password" id="register-password" placeholder="密码" class="input" />
+      <button id="register-btn" class="btn btn-primary w-full mt-3">注册</button>
+      <p class="text-sm mt-4">已有账号？<a href="#" id="go-login" class="link">返回登录</a></p>
+    </section>
 
-    <!-- 主计划页面 -->
-    <div id="plan-section" style="display:none;">
+    <!-- 📋 主计划页面 -->
+    <section id="plan-section" style="display:none;">
       <h2>你的计划任务</h2>
-      <div>
-        <input type="text" id="goal-input" placeholder="请输入你的学习目标" />
-        <button id="generate-plan">生成7天计划</button>
+
+      <!-- 🎯 目标与自动生成 -->
+      <div class="flex gap-2 items-center mt-4">
+        <input type="text" id="goal-input" placeholder="请输入你的学习目标" class="input flex-1" />
+        <button id="generate-plan" class="btn btn-secondary">生成 7 天计划</button>
       </div>
 
-      <!-- 手动添加任务区域 -->
-      <div id="manual-add">
-        <h3>✍️ 手动添加任务</h3>
-        <input type="text" id="manual-task" placeholder="任务内容" />
-        <input type="date" id="manual-date" />
-        <input type="number" id="manual-duration" placeholder="时长 (小时)" min="0.5" step="0.5" />
-        <button id="add-task-btn">添加任务</button>
+      <!-- ✍️ 手动添加任务 -->
+      <div id="manual-add" class="card mt-6 p-4">
+        <h3 class="card-title">✍️ 手动添加任务</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-4 gap-2 mt-3">
+          <input type="text" id="manual-task" placeholder="任务内容" class="input col-span-2" />
+          <input type="date" id="manual-date" class="input" />
+          <input type="number" id="manual-duration" placeholder="时长 (小时)" min="0.5" step="0.5" class="input" />
+        </div>
+        <button id="add-task-btn" class="btn btn-primary w-full sm:w-auto mt-3">添加任务</button>
       </div>
 
-      <div id="task-board"></div>
-      <button id="logout-btn">退出登录</button>
+      <!-- 📌 任务看板 -->
+      <div id="task-board" class="task-board mt-6"></div>
+
+      <button id="logout-btn" class="btn btn-outline mt-8 w-full">退出登录</button>
+    </section>
+  </div>
+
+  <!-- 🛠️ 任务编辑弹窗 -->
+  <div id="edit-modal" class="modal" style="display:none;">
+    <div class="modal-content">
+      <h3 class="mb-4">编辑任务</h3>
+      <input type="text" id="edit-task-text" placeholder="任务内容" class="input" />
+      <input type="number" id="edit-duration" step="0.5" min="0.5" placeholder="时长" class="input mt-2" />
+      <div class="flex justify-end gap-2 mt-4">
+        <button id="save-edit" class="btn btn-primary">保存</button>
+        <button id="cancel-edit" class="btn btn-outline">取消</button>
+      </div>
     </div>
   </div>
 
-  <!-- ✅ 编辑弹窗 -->
-  <div id="edit-modal" style="display:none; position:fixed; top:30%; left:50%; transform:translate(-50%, -50%); background:#fff; padding:20px; border:1px solid #ccc; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.2); z-index:1000;">
-    <h3>编辑任务</h3>
-    <input type="text" id="edit-task-text" placeholder="任务内容" />
-    <input type="number" id="edit-duration" step="0.5" min="0.5" placeholder="时长" />
-    <button id="save-edit">保存</button>
-    <button id="cancel-edit">取消</button>
-  </div>
+  <!-- 🤖 聊天按钮 -->
+  <button id="chat-toggle" class="chat-toggle">🤖</button>
 
-  <!-- ✅ 聊天按钮 -->
-  <div id="chat-toggle">🤖</div>
-
-  <!-- ✅ 聊天窗口 -->
-  <div id="chat-box" style="display: none;">
-    <div id="chat-messages"></div>
-    <div id="chat-input-area">
-      <input type="text" id="chat-input" placeholder="和AI聊聊吧..." />
-      <button id="chat-send">发送</button>
+  <!-- 💬 聊天窗口 -->
+  <div id="chat-box" class="chat" style="display: none;">
+    <div id="chat-messages" class="chat-messages"></div>
+    <div id="chat-input-area" class="chat-input-area">
+      <input type="text" id="chat-input" placeholder="和 AI 聊聊吧..." class="input flex-1" />
+      <button id="chat-send" class="btn btn-primary">发送</button>
     </div>
   </div>
 
-  <script src="main.js"></script>
+  <!-- ⏱️ 专注模式弹窗 -->
+  <div id="focus-modal" class="modal focus-modal" style="display: none;">
+    <div id="focus-time" class="text-4xl font-semibold">00:00:00</div>
+    <button onclick="closeFocus()" class="btn btn-outline mt-6">❌ 退出专注</button>
+  </div>
+
+  <!-- 🚀 Scripts -->
+  <script src="/main.js"></script>
   <script>
+    // Inline handler for edit modal (保留原有 JS)
     let currentEditTaskId = null;
 
     document.addEventListener("click", (e) => {
@@ -104,11 +128,5 @@
       loadTasks();
     });
   </script>
-  <!-- 专注模式弹窗 -->
-<div id="focus-modal" style="display: none;">
-  <div id="focus-time">00:00:00</div>
-  <button onclick="closeFocus()">❌ 退出专注</button>
-</div>
-
 </body>
 </html>
