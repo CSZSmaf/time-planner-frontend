@@ -343,20 +343,18 @@ a:hover { text-decoration: underline; }
 .page-layout {
   display: flex;
   min-height: 100vh;
-  align-items: flex-start;
 }
 
-/* 📜 左边栏历史任务 */
 #sidebar-history {
-  width: 260px;
-  padding: 20px;
-  background-color: #f1f5f9;
+  width: 180px;
+  padding: 16px;
+  background-color: #f8fafc;
   border-right: 1px solid #e5e7eb;
-  box-shadow: inset -1px 0 0 #e5e7eb;
   height: 100vh;
   overflow-y: auto;
   position: sticky;
   top: 0;
+  flex-shrink: 0;
 }
 
 #sidebar-history .history-section {
@@ -378,7 +376,6 @@ a:hover { text-decoration: underline; }
   color: #6b7280;
 }
 
-/* 🧱 主内容容器 */
 .main-content {
   flex: 1;
   padding: 40px;

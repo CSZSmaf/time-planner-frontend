@@ -71,12 +71,13 @@ document.getElementById("register-btn").onclick = async () => {
   }
 };
 
-async function showPlanSection() {
-  loginSection.style.display = "none";
-  registerSection.style.display = "none";
-  planSection.style.display = "block";
-  await loadTasks();
+function showPlanSection() {
+  document.getElementById("auth-container").style.display = "none";
+  document.getElementById("main-layout").style.display = "flex"; // 显示登录后的整体布局
+  document.getElementById("plan-section").style.display = "block";
+  loadTasks();
 }
+
 
 async function loadTasks() {
   taskBoard.innerHTML = "<p>正在加载任务...</p>";
