@@ -340,30 +340,33 @@ a:hover { text-decoration: underline; }
   border-left: 3px solid #a5b4fc;
   padding-left: 10px;
 }
-.task-board-wrapper {
+.task-layout {
   display: flex;
   gap: 20px;
   align-items: flex-start;
+  margin-top: 20px;
 }
 
-/* 任务主区（右侧） */
+/* 左侧历史任务栏 */
+#history-wrapper {
+  flex: 0 0 240px;
+}
+
+/* 右侧主任务栏 */
 #task-board {
   flex: 1;
 }
 
-/* 历史任务区（左侧） */
+/* 历史任务样式 */
 .history-section {
-  flex: 0 0 220px;
   padding: 16px;
   background-color: #f9fafb;
   border: 1px solid #d1d5db;
   border-radius: 8px;
-  max-height: 600px;
-  overflow-y: auto;
 }
 .history-section h3 {
   font-size: 16px;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   color: #4b5563;
 }
 .history-item {
