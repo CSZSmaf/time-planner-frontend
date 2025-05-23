@@ -300,3 +300,24 @@ a:hover { text-decoration: underline; }
   .container { padding: 20px; margin-top: 20px; }
   #chat-box { width: 90vw; right: 5vw; height: 60vh; }
 }
+/* 折叠/展开按钮 */
+.task-day > button {
+  display: inline-block;
+  font-size: 13px;
+  padding: 4px 10px;
+  margin: 8px 0;
+  background-color: #e0e7ff;
+  color: #1e3a8a;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+.task-day > button:hover {
+  background-color: #bfdbfe;
+}
+
+/* 折叠列表容器 */
+.task-day > div {
+  margin-left: 16px;
+}

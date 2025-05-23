@@ -10,6 +10,7 @@ let currentEditTaskId = null;
 let focusInterval = null;
 let currentFocusTask = null;
 let currentElapsed = 0;
+
 // 页面切换
 document.getElementById("go-register").onclick = () => {
   loginSection.style.display = "none";
@@ -83,28 +84,54 @@ async function loadTasks() {
     const res = await fetch(`${API_BASE}/api/tasks/${currentUserId}`);
     const data = await res.json();
 
+    // 按日期分组
     const grouped = {};
     for (const task of data) {
-      const dateKey = task.date;
+      const dateKey = task.date.slice(0, 10);
       if (!grouped[dateKey]) grouped[dateKey] = [];
       grouped[dateKey].push(task);
     }
 
     taskBoard.innerHTML = "";
+    const today = new Date().toISOString().slice(0, 10);
+
     for (const date in grouped) {
       const section = document.createElement("div");
       section.className = "task-day";
 
+      // 标题
       const d = new Date(date);
       const title = document.createElement("h3");
       title.textContent = `📅 ${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
       section.appendChild(title);
 
+      // 判断是否为今天
+      const isToday = date === today;
+      // 列表容器
+      const listContainer = document.createElement("div");
+      listContainer.style.display = isToday ? "block" : "none";
+
+      // 展开/收起按钮
+      const toggleBtn = document.createElement("button");
+      toggleBtn.textContent = isToday ? "收起" : "展开";
+      toggleBtn.style.margin = "4px 0";
+      toggleBtn.onclick = () => {
+        if (listContainer.style.display === "none") {
+          listContainer.style.display = "block";
+          toggleBtn.textContent = "收起";
+        } else {
+          listContainer.style.display = "none";
+          toggleBtn.textContent = "展开";
+        }
+      };
+      section.appendChild(toggleBtn);
+      section.appendChild(listContainer);
+
+      // 渲染已完成 & 未完成
       const doneList = grouped[date].filter((t) => t.done);
       const undoneList = grouped[date].filter((t) => !t.done);
-
-      renderList(doneList, "✅ 已完成任务：", section);
-      renderList(undoneList, "🕒 未完成任务：", section);
+      renderList(doneList, "✅ 已完成任务：", listContainer);
+      renderList(undoneList, "🕒 未完成任务：", listContainer);
 
       taskBoard.appendChild(section);
     }
@@ -113,13 +140,14 @@ async function loadTasks() {
   }
 }
 
-function renderList(tasks, label, section) {
+// 渲染任务列表至指定容器
+function renderList(tasks, label, container) {
   if (tasks.length === 0) return;
   const subTitle = document.createElement("p");
   subTitle.textContent = label;
   subTitle.style.fontWeight = "bold";
   subTitle.style.margin = "8px 0 4px";
-  section.appendChild(subTitle);
+  container.appendChild(subTitle);
 
   tasks.forEach((t) => {
     const item = document.createElement("div");
@@ -152,6 +180,7 @@ function renderList(tasks, label, section) {
     const actions = document.createElement("div");
     actions.className = "task-actions";
 
+    // 提醒按钮
     const remindBtn = document.createElement("button");
     remindBtn.textContent = "⏰ 提醒";
     remindBtn.onclick = () => {
@@ -162,6 +191,7 @@ function renderList(tasks, label, section) {
       }
     };
 
+    // 专注按钮
     const focusBtn = document.createElement("button");
     focusBtn.textContent = "🧘 专注";
     focusBtn.onclick = () => {
@@ -173,6 +203,7 @@ function renderList(tasks, label, section) {
       startFocusTimer();
     };
 
+    // 编辑按钮
     const editBtn = document.createElement("button");
     editBtn.textContent = "✏️";
     editBtn.onclick = () => {
@@ -182,6 +213,7 @@ function renderList(tasks, label, section) {
       document.getElementById("edit-modal").style.display = "block";
     };
 
+    // 删除按钮
     const deleteBtn = document.createElement("button");
     deleteBtn.textContent = "🗑️";
     deleteBtn.onclick = async () => {
@@ -208,7 +240,7 @@ function renderList(tasks, label, section) {
 
     item.appendChild(leftSide);
     item.appendChild(actions);
-    section.appendChild(item);
+    container.appendChild(item);
   });
 }
 
@@ -227,7 +259,7 @@ function startFocusTimer() {
     timeDisplay.textContent = formatTime(currentElapsed);
   }, 1000);
 
-  // 每 60 秒同步一次
+  // 同步已学时
   setInterval(async () => {
     if (currentFocusTask) {
       await fetch(`${API_BASE}/api/tasks/${currentFocusTask.id}/elapsed`, {
@@ -239,14 +271,11 @@ function startFocusTimer() {
   }, 60000);
 }
 
-// 专注弹窗控制
 function closeFocus() {
   clearInterval(focusInterval);
   document.getElementById("focus-modal").style.display = "none";
   focusInterval = null;
   currentFocusTask = null;
-
-  // 退出全屏
   document.exitFullscreen?.();
 }
 
@@ -366,11 +395,12 @@ function appendMessage(sender, text) {
 
   // 使用 marked 解析 Markdown
   const html = marked.parse(text || "");
-  entry.innerHTML = `<strong>${sender}</strong><div class="markdown">${html}</div>`;
+  entry.innerHTML = `<strong>${sender}</strong><div class=\"markdown\">${html}</div>`;
 
   chat.appendChild(entry);
   chat.scrollTop = chat.scrollHeight;
 }
+
 // 初始化通知权限
 if ("Notification" in window && Notification.permission !== "granted") {
   Notification.requestPermission();
@@ -387,11 +417,9 @@ setInterval(() => {
           const taskId = key.replace("reminder_", "");
           const taskText = document.querySelector(`[data-id='${taskId}'] .task-text`)?.textContent || "某个任务";
           new Notification("⏰ 时间到啦！", { body: `请开始：${taskText}` });
-          localStorage.removeItem(key); // 提醒后移除
+          localStorage.removeItem(key);
         }
       }
     }
   }
 }, 30000);
-
-
