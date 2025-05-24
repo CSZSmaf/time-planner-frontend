@@ -385,3 +385,6 @@ a:hover { text-decoration: underline; }
   overflow-y: auto;
   z-index: 10;
 }
+.main-content:empty {
+  display: none;
+}
