@@ -38,6 +38,7 @@ document.getElementById("login-btn").onclick = async () => {
     if (res.ok) {
       currentUserId = data.userId;
       showPlanSection();
+      document.getElementById('auth-container').style.display = 'none';
     } else {
       alert(data.error || "登录失败");
     }
