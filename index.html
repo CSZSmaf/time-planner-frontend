@@ -1,129 +1,594 @@
+
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="zh-CN">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>AI时间规划</title>
-  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    }
+    
+    /* 自定义滚动条 */
+    ::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #f1f5f9;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #94a3b8;
+    }
+    
+    /* 渐变背景 */
+    .gradient-bg {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    /* 玻璃拟态效果 */
+    .glass-morphism {
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+    
+    /* 动画效果 */
+    .fade-in {
+      animation: fadeIn 0.3s ease-in;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* 输入框聚焦效果 */
+    .input-focus {
+      transition: all 0.3s ease;
+    }
+    
+    .input-focus:focus {
+      border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+    
+    /* 任务卡片悬停效果 */
+    .task-card {
+      transition: all 0.2s ease;
+    }
+    
+    .task-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+    }
+    
+    /* Markdown 样式 */
+    .markdown h1, .markdown h2, .markdown h3 {
+      margin-top: 1rem;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+    }
+    
+    .markdown code {
+      background-color: #f3f4f6;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.875rem;
+    }
+    
+    .markdown pre {
+      background-color: #1f2937;
+      color: #f9fafb;
+      padding: 1rem;
+      border-radius: 8px;
+      overflow-x: auto;
+      margin: 1rem 0;
+    }
+    
+    .markdown ul, .markdown ol {
+      margin-left: 1.5rem;
+      margin-top: 0.5rem;
+    }
+    
+    /* 按钮样式 */
+    .btn-primary {
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+    }
+    
+    /* 专注模式背景 */
+    .focus-bg {
+      background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+    }
+  </style>
 </head>
-<body>
-  <!-- 登录与注册 -->
-  <div id="auth-container">
-    <div class="container">
-      <!-- 登录模块 -->
-      <div id="login-section">
-        <h2>登录你的学习账号</h2>
-        <input type="email" id="login-email" placeholder="邮箱" />
-        <input type="password" id="login-password" placeholder="密码" />
-        <button id="login-btn">登录</button>
-        <p>还没有账号？<a href="#" id="go-register">点击注册</a></p>
+<body class="bg-gray-50">
+  <!-- 认证容器 -->
+  <div id="auth-container" class="min-h-screen flex items-center justify-center p-4">
+    <div class="w-full max-w-md">
+      <!-- 登录部分 -->
+      <div id="login-section" class="glass-morphism rounded-2xl shadow-2xl p-8 fade-in">
+        <div class="text-center mb-8">
+          <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full mb-4">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+          <h2 class="text-2xl font-bold text-gray-800">欢迎回来</h2>
+          <p class="text-gray-600 mt-2">登录你的学习账号</p>
+        </div>
+        
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">邮箱</label>
+            <input type="email" id="login-email" placeholder="your@email.com" 
+              class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none input-focus">
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">密码</label>
+            <input type="password" id="login-password" placeholder="••••••••" 
+              class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none input-focus">
+          </div>
+          
+          <button id="login-btn" class="w-full py-3 px-4 btn-primary text-white font-medium rounded-lg">
+            登录
+          </button>
+          
+          <div class="text-center text-sm text-gray-600">
+            还没有账号？
+            <a href="#" id="go-register" class="text-indigo-600 hover:text-indigo-700 font-medium">点击注册</a>
+          </div>
+        </div>
       </div>
-
-      <!-- 注册模块 -->
-      <div id="register-section" style="display:none;">
-        <h2>注册新账号</h2>
-        <input type="email" id="register-email" placeholder="邮箱" />
-        <input type="password" id="register-password" placeholder="密码" />
-        <button id="register-btn">注册</button>
-        <p>已有账号？<a href="#" id="go-login">返回登录</a></p>
+      
+      <!-- 注册部分 -->
+      <div id="register-section" class="glass-morphism rounded-2xl shadow-2xl p-8 fade-in" style="display: none;">
+        <div class="text-center mb-8">
+          <div class="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-green-500 to-teal-600 rounded-full mb-4">
+            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"></path>
+            </svg>
+          </div>
+          <h2 class="text-2xl font-bold text-gray-800">创建账号</h2>
+          <p class="text-gray-600 mt-2">开始你的学习之旅</p>
+        </div>
+        
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">邮箱</label>
+            <input type="email" id="register-email" placeholder="your@email.com" 
+              class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none input-focus">
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">密码</label>
+            <input type="password" id="register-password" placeholder="••••••••" 
+              class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none input-focus">
+          </div>
+          
+          <button id="register-btn" class="w-full py-3 px-4 btn-primary text-white font-medium rounded-lg">
+            注册
+          </button>
+          
+          <div class="text-center text-sm text-gray-600">
+            已有账号？
+            <a href="#" id="go-login" class="text-indigo-600 hover:text-indigo-700 font-medium">返回登录</a>
+          </div>
+        </div>
       </div>
     </div>
   </div>
-
-
-
-  <!-- 主体内容区域 -->
-  <div id="main-layout" class="page-layout" style="display: none;">
-      <!-- 历史任务栏 -->
-  <aside id="sidebar-history" style="display: none;"></aside>
-  <main class="main-content" style="display: none;"></main>
-
-    <div class="container">
-      <!-- 主计划页面 -->
-      <div id="plan-section" style="display:none;">
-        <h2>你的计划任务</h2>
+  
+  <!-- 主布局 -->
+  <div id="main-layout" style="display: none;">
+    <!-- 左侧历史栏 -->
+    <div id="sidebar-history" class="fixed top-0 left-0 w-64 h-screen bg-white border-r border-gray-200 overflow-y-auto" style="display: none;">
+      <div class="p-6">
+        <h3 class="text-lg font-semibold text-gray-800 mb-4">📚 学习历史</h3>
+        <!-- 历史内容将通过 JS 动态插入 -->
+      </div>
+    </div>
+    
+    <!-- 主内容区 -->
+    <div class="main-content ml-64 min-h-screen">
+      <div id="plan-section" class="container mx-auto max-w-5xl p-6" style="display: none;">
+        <!-- 顶部导航 -->
+        <div class="glass-morphism rounded-xl p-6 mb-6">
+          <div class="flex justify-between items-center">
+            <div>
+              <h1 class="text-2xl font-bold text-gray-800">AI 学习规划助手</h1>
+              <p class="text-gray-600 mt-1">让AI帮你制定完美的学习计划</p>
+            </div>
+            <button id="logout-btn" class="px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg transition">
+              退出登录
+            </button>
+          </div>
+        </div>
+        
+        <!-- AI 计划生成 -->
+        <div class="bg-gradient-to-r from-indigo-500 to-purple-600 rounded-xl p-6 mb-6 text-white">
+          <h3 class="text-xl font-semibold mb-4">🤖 AI 智能规划</h3>
+          <div class="flex gap-4">
+            <input type="text" id="goal-input" placeholder="输入你的学习目标，如：7天学会Python基础" 
+              class="flex-1 px-4 py-3 rounded-lg text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-white">
+            <button id="generate-plan" class="px-6 py-3 bg-white text-indigo-600 font-medium rounded-lg hover:bg-gray-100 transition">
+              生成7天计划
+            </button>
+          </div>
+        </div>
+        
+        <!-- 手动添加任务 -->
+        <div class="glass-morphism rounded-xl p-6 mb-6">
+          <h3 class="text-lg font-semibold text-gray-800 mb-4">✍️ 手动添加任务</h3>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <input type="text" id="manual-task" placeholder="任务内容" 
+              class="px-4 py-3 rounded-lg border border-gray-300 focus:outline-none input-focus">
+            <input type="date" id="manual-date" 
+              class="px-4 py-3 rounded-lg border border-gray-300 focus:outline-none input-focus">
+            <div class="flex gap-2">
+              <input type="number" id="manual-duration" step="0.5" placeholder="时长(小时)" 
+                class="flex-1 px-4 py-3 rounded-lg border border-gray-300 focus:outline-none input-focus">
+              <button id="add-task-btn" class="px-6 py-3 bg-green-500 hover:bg-green-600 text-white font-medium rounded-lg transition">
+                添加
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 任务列表 -->
+        <div id="task-board" class="space-y-4">
+          <div class="text-center py-8">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-gray-200 rounded-full mb-4">
+              <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+              </svg>
+            </div>
+            <p class="text-gray-500">正在加载任务...</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 编辑任务模态框 -->
+  <div id="edit-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50" style="display: none;">
+    <div class="bg-white rounded-xl p-6 w-full max-w-md fade-in">
+      <h3 class="text-xl font-semibold text-gray-800 mb-4">编辑任务</h3>
+      <div class="space-y-4">
         <div>
-          <input type="text" id="goal-input" placeholder="请输入你的学习目标" />
-          <button id="generate-plan">生成7天计划</button>
+          <label class="block text-sm font-medium text-gray-700 mb-1">任务内容</label>
+          <input type="text" id="edit-task-text" 
+            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none input-focus">
         </div>
-
-        <!-- 手动添加任务区域 -->
-        <div id="manual-add">
-          <h3>✍️ 手动添加任务</h3>
-          <input type="text" id="manual-task" placeholder="任务内容" />
-          <input type="date" id="manual-date" />
-          <input type="number" id="manual-duration" placeholder="时长 (小时)" min="0.5" step="0.5" />
-          <button id="add-task-btn">添加任务</button>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">预计时长(小时)</label>
+          <input type="number" id="edit-duration" step="0.5" 
+            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:outline-none input-focus">
         </div>
-
-        <div id="task-board"></div>
-        <button id="logout-btn">退出登录</button>
+        <div class="flex gap-3">
+          <button id="save-edit" class="flex-1 py-3 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition">
+            保存
+          </button>
+          <button id="cancel-edit" class="flex-1 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium rounded-lg transition">
+            取消
+          </button>
+        </div>
       </div>
     </div>
   </div>
-
-  <!-- 编辑弹窗 -->
-  <div id="edit-modal" style="display:none; position:fixed; top:30%; left:50%; transform:translate(-50%, -50%); background:#fff; padding:20px; border:1px solid #ccc; border-radius:8px; box-shadow:0 4px 12px rgba(0,0,0,0.2); z-index:1000;">
-    <h3>编辑任务</h3>
-    <input type="text" id="edit-task-text" placeholder="任务内容" />
-    <input type="number" id="edit-duration" step="0.5" min="0.5" placeholder="时长" />
-    <button id="save-edit">保存</button>
-    <button id="cancel-edit">取消</button>
-  </div>
-
+  
   <!-- 聊天按钮 -->
-  <div id="chat-toggle">🤖</div>
-
+  <button id="chat-toggle" class="fixed bottom-6 right-6 w-14 h-14 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center z-40">
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
+    </svg>
+  </button>
+  
   <!-- 聊天窗口 -->
-  <div id="chat-box" style="display: none;">
-    <div id="chat-messages"></div>
-    <div id="chat-input-area">
-      <input type="text" id="chat-input" placeholder="和AI聊聊吧..." />
-      <button id="chat-send">发送</button>
+  <div id="chat-box" class="fixed bottom-24 right-6 w-96 h-[500px] bg-white rounded-xl shadow-2xl flex flex-col z-40" style="display: none;">
+    <div class="bg-gradient-to-r from-indigo-500 to-purple-600 text-white px-6 py-4 rounded-t-xl">
+      <h3 class="font-semibold">🤖 AI 学习助手</h3>
+    </div>
+    <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50">
+      <!-- 消息内容将通过 JS 动态插入 -->
+    </div>
+    <div id="chat-input-area" class="p-4 border-t border-gray-200">
+      <div class="flex gap-2">
+        <input type="text" id="chat-input" placeholder="输入你的问题..." 
+          class="flex-1 px-4 py-2 rounded-lg border border-gray-300 focus:outline-none input-focus">
+        <button id="chat-send" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition">
+          发送
+        </button>
+      </div>
     </div>
   </div>
-
-  <!-- 专注弹窗 -->
-  <div id="focus-modal" style="display: none;">
-    <div id="focus-time">00:00:00</div>
-    <button onclick="closeFocus()">❌ 退出专注</button>
+  
+  <!-- 专注模式 -->
+  <div id="focus-modal" class="fixed inset-0 focus-bg flex flex-col items-center justify-center z-50" style="display: none;">
+    <div class="text-center">
+      <div class="mb-8">
+        <div class="inline-flex items-center justify-center w-24 h-24 bg-white bg-opacity-10 rounded-full mb-6">
+          <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+        <div id="focus-time" class="text-7xl font-bold text-white mb-2">00:00:00</div>
+        <p class="text-xl text-gray-300">专注中，加油！</p>
+      </div>
+      <button onclick="closeFocus()" class="px-8 py-3 bg-red-500 hover:bg-red-600 text-white font-medium rounded-lg transition">
+        ❌ 退出专注
+      </button>
+    </div>
   </div>
-
-  <!-- 脚本 -->
+  
   <script src="main.js"></script>
   <script>
-    let currentEditTaskId = null;
-
-    document.addEventListener("click", (e) => {
-      if (e.target.classList.contains("edit-btn")) {
-        const item = e.target.closest(".task-item");
-        currentEditTaskId = item.dataset.id;
-        const taskText = item.querySelector(".task-text").textContent;
-        const durationText = item.querySelector(".duration").textContent;
-
-        document.getElementById("edit-task-text").value = taskText.replace(/^📝\s*/, "");
-        document.getElementById("edit-duration").value = parseFloat(durationText);
-        document.getElementById("edit-modal").style.display = "block";
-      }
-
-      if (e.target.id === "cancel-edit") {
-        document.getElementById("edit-modal").style.display = "none";
-      }
-    });
-
-    document.getElementById("save-edit").addEventListener("click", async () => {
-      const task = document.getElementById("edit-task-text").value;
-      const duration = parseFloat(document.getElementById("edit-duration").value);
-
-      await fetch(`${API_BASE}/api/tasks/${currentEditTaskId}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ task, duration })
+    // 修改渲染任务列表函数以适应新的UI
+    const originalRenderList = window.renderList;
+    window.renderList = function(tasks, label, container) {
+      if (tasks.length === 0) return;
+      
+      const subTitle = document.createElement("h4");
+      subTitle.textContent = label;
+      subTitle.className = "text-lg font-semibold text-gray-700 mb-3";
+      container.appendChild(subTitle);
+      
+      tasks.forEach((t) => {
+        const item = document.createElement("div");
+        item.className = "bg-white rounded-lg border border-gray-200 p-4 mb-3 task-card";
+        item.dataset.id = t.id;
+        
+        const mainContent = document.createElement("div");
+        mainContent.className = "flex items-center justify-between mb-3";
+        
+        const leftSide = document.createElement("div");
+        leftSide.className = "flex items-center gap-3";
+        
+        const checkbox = document.createElement("input");
+        checkbox.type = "checkbox";
+        checkbox.checked = t.done;
+        checkbox.className = "w-5 h-5 text-indigo-600 rounded focus:ring-indigo-500";
+        
+        const content = document.createElement("span");
+        content.className = "text-gray-800 font-medium";
+        content.textContent = t.task;
+        if (t.done) content.className += " line-through text-gray-500";
+        
+        const duration = document.createElement("span");
+        duration.className = "px-3 py-1 bg-gray-100 text-gray-600 text-sm rounded-full";
+        duration.textContent = `${t.duration}h`;
+        
+        leftSide.appendChild(checkbox);
+        leftSide.appendChild(content);
+        
+        mainContent.appendChild(leftSide);
+        mainContent.appendChild(duration);
+        
+        const actions = document.createElement("div");
+        actions.className = "flex gap-2 justify-end";
+        
+        // 提醒按钮
+        const remindBtn = document.createElement("button");
+        remindBtn.className = "px-3 py-1.5 bg-yellow-100 hover:bg-yellow-200 text-yellow-700 rounded-lg text-sm transition";
+        remindBtn.innerHTML = '⏰ 提醒';
+        remindBtn.onclick = () => {
+          const time = prompt("请输入提醒时间（格式如：2025-05-21T15:30）", new Date().toISOString().slice(0, 16));
+          if (time) {
+            localStorage.setItem(`reminder_${t.id}`, time);
+            alert(`提醒已设置：${time.replace('T', ' ')}`);
+          }
+        };
+        
+        // 专注按钮
+        const focusBtn = document.createElement("button");
+        focusBtn.className = "px-3 py-1.5 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-lg text-sm transition";
+        focusBtn.innerHTML = '🧘 专注';
+        focusBtn.onclick = () => {
+          currentFocusTask = t;
+          currentElapsed = t.elapsed_seconds || 0;
+          document.getElementById("focus-time").textContent = formatTime(currentElapsed);
+          document.getElementById("focus-modal").style.display = "flex";
+          document.documentElement.requestFullscreen?.();
+          startFocusTimer();
+        };
+        
+        // 编辑按钮
+        const editBtn = document.createElement("button");
+        editBtn.className = "px-3 py-1.5 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded-lg text-sm transition";
+        editBtn.innerHTML = '✏️ 编辑';
+        editBtn.onclick = () => {
+          currentEditTaskId = t.id;
+          document.getElementById("edit-task-text").value = t.task;
+          document.getElementById("edit-duration").value = t.duration;
+          document.getElementById("edit-modal").style.display = "flex";
+        };
+        
+        // 删除按钮
+        const deleteBtn = document.createElement("button");
+        deleteBtn.className = "px-3 py-1.5 bg-red-100 hover:bg-red-200 text-red-700 rounded-lg text-sm transition";
+        deleteBtn.innerHTML = '🗑️ 删除';
+        deleteBtn.onclick = async () => {
+          if (confirm("确定要删除这个任务吗？")) {
+            await fetch(`${API_BASE}/api/tasks/${t.id}`, { method: "DELETE" });
+            await loadTasks();
+          }
+        };
+        
+        checkbox.onchange = async () => {
+          const done = checkbox.checked;
+          await fetch(`${API_BASE}/api/tasks/${t.id}/done`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ done }),
+          });
+          await loadTasks();
+        };
+        
+        actions.appendChild(remindBtn);
+        actions.appendChild(focusBtn);
+        actions.appendChild(editBtn);
+        actions.appendChild(deleteBtn);
+        
+        item.appendChild(mainContent);
+        item.appendChild(actions);
+        container.appendChild(item);
       });
-
-      document.getElementById("edit-modal").style.display = "none";
-      loadTasks();
-    });
+    };
+    
+    // 修改消息显示样式
+    const originalAppendMessage = window.appendMessage;
+    window.appendMessage = function(sender, text) {
+      const chat = document.getElementById("chat-messages");
+      const entry = document.createElement("div");
+      entry.className = "mb-3";
+      
+      const isUser = sender.includes("你");
+      const messageClass = isUser ? "bg-indigo-600 text-white ml-auto" : "bg-white border border-gray-200";
+      
+      const html = marked.parse(text || "");
+      entry.innerHTML = `
+        <div class="${messageClass} rounded-lg p-3 max-w-[80%] ${isUser ? 'text-right' : ''}">
+          <div class="text-sm font-medium mb-1">${sender}</div>
+          <div class="markdown">${html}</div>
+        </div>
+      `;
+      
+      chat.appendChild(entry);
+      chat.scrollTop = chat.scrollHeight;
+    };
+    
+    // 修改任务板块样式
+    const originalLoadTasks = window.loadTasks;
+    window.loadTasks = async function() {
+      const taskBoard = document.getElementById("task-board");
+      taskBoard.innerHTML = `
+        <div class="text-center py-8">
+          <div class="inline-flex items-center justify-center w-16 h-16 bg-gray-200 rounded-full mb-4 animate-pulse">
+            <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
+            </svg>
+          </div>
+          <p class="text-gray-500">正在加载任务...</p>
+        </div>
+      `;
+      
+      try {
+        const res = await fetch(`${API_BASE}/api/tasks/${currentUserId}`);
+        const data = await res.json();
+        
+        const today = new Date().toISOString().slice(0, 10);
+        
+        // 分离历史已完成任务
+        const historyCompleted = data.filter(task => task.done && task.date.slice(0, 10) < today);
+        const mainTasks = data.filter(task => task.date.slice(0, 10) >= today);
+        
+        // 按日期分组
+        const grouped = {};
+        for (const task of mainTasks) {
+          const dateKey = task.date.slice(0, 10);
+          if (!grouped[dateKey]) grouped[dateKey] = [];
+          grouped[dateKey].push(task);
+        }
+        
+        taskBoard.innerHTML = "";
+        
+        // 渲染日期分组任务
+        for (const date in grouped) {
+          const section = document.createElement("div");
+          section.className = "bg-white rounded-xl border border-gray-200 p-6 mb-4";
+          
+          const d = new Date(date);
+          const title = document.createElement("h3");
+          title.className = "text-xl font-semibold text-gray-800 mb-3 flex items-center gap-2";
+          title.innerHTML = `
+            <span class="text-2xl">📅</span>
+            ${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}
+          `;
+          section.appendChild(title);
+          
+          const isToday = date === today;
+          const listContainer = document.createElement("div");
+          listContainer.style.display = isToday ? "block" : "none";
+          
+          const toggleBtn = document.createElement("button");
+          toggleBtn.className = "mb-4 px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm transition";
+          toggleBtn.textContent = isToday ? "收起" : "展开";
+          toggleBtn.onclick = () => {
+            if (listContainer.style.display === "none") {
+              listContainer.style.display = "block";
+              toggleBtn.textContent = "收起";
+            } else {
+              listContainer.style.display = "none";
+              toggleBtn.textContent = "展开";
+            }
+          };
+          
+          section.appendChild(toggleBtn);
+          section.appendChild(listContainer);
+          
+          const doneList = grouped[date].filter((t) => t.done);
+          const undoneList = grouped[date].filter((t) => !t.done);
+          renderList(undoneList, "🕒 待完成任务", listContainer);
+          renderList(doneList, "✅ 已完成任务", listContainer);
+          
+          taskBoard.appendChild(section);
+        }
+        
+        // 渲染历史任务
+        if (historyCompleted.length > 0) {
+          const historySection = document.createElement("div");
+          historySection.className = "space-y-2";
+          
+          historyCompleted.forEach(t => {
+            const item = document.createElement("div");
+            item.className = "p-3 bg-gray-50 rounded-lg border-l-4 border-indigo-400 hover:bg-gray-100 transition";
+            item.innerHTML = `
+              <div class="text-sm text-gray-600">${t.date.slice(0,10)}</div>
+              <div class="text-gray-800 font-medium">${t.task}</div>
+              <div class="text-sm text-gray-500">用时: ${t.duration}h</div>
+            `;
+            historySection.appendChild(item);
+          });
+          
+          const sidebar = document.getElementById("sidebar-history");
+          sidebar.innerHTML = `
+            <div class="p-6">
+              <h3 class="text-lg font-semibold text-gray-800 mb-4">📚 学习历史</h3>
+              ${historySection.outerHTML}
+            </div>
+          `;
+        }
+        
+      } catch (err) {
+        taskBoard.innerHTML = `
+          <div class="text-center py-8">
+            <div class="inline-flex items-center justify-center w-16 h-16 bg-red-100 rounded-full mb-4">
+              <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            <p class="text-gray-600">连接失败，请稍后重试</p>
+          </div>
+        `;
+      }
+    };
   </script>
 </body>
 </html>
